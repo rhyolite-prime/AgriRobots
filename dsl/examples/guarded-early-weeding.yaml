@@ -1,0 +1,38 @@
+apiVersion: agri.script/v1
+kind: Task
+metadata:
+  name: guarded-early-weeding-crop-a
+  version: 0.3.0
+  owner: agronomy-lead
+  changeTicket: AGR-WD-033
+spec:
+  requires:
+    cassette: {type: weeding, capability: mechanical_weed.v1}
+    operatorPolicy: supervisor_on_site
+    zones: [plot-a-guarded]
+  limits: {travel_mps: 0.25, max_retries: 0, deadline_s: 1200}
+  preflight:
+    - model.crop_a.version in approved_models
+    - model.crop_a.validation.confidence_calibrated == true
+    - localization.integrity == VALID
+    - zone.plot_a_guarded.access_state == RESTRICTED
+    - tool.calibration.age_days <= 1
+  steps:
+    - navigate: {route: plot-a-entry, speed_mps: 0.20, timeout_s: 300}
+    - scan_row:
+        camera_profile: crop-a-early
+        max_s: 700
+        on_detection:
+          when: weed.confidence >= 0.98 && crop.clearance_mm >= 20 && pose.sigma_mm <= 3 && latency_ms <= 100
+          do:
+            - mechanical_weed: {target: weed, max_force_n: 25, timeout_ms: 350}
+            - record: {event: weed_action, fields: [image_id, model_version, pose_sigma_mm, clearance_mm, force_trace]}
+          otherwise:
+            - record: {event: abstained_detection, fields: [image_id, reason, model_version]}
+    - return_to: {location: field-service-bay, timeout_s: 300}
+  on_fault:
+    - park_tool: {}
+    - safe_stop: {reason: weeding_fault}
+    - notify: {role: agronomy-lead, severity: high}
+  evidence:
+    retain: [recipe_hash, model_version, calibration_bundle, image_id, action_events, abstentions, safety_events]

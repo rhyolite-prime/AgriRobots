@@ -1,0 +1,34 @@
+apiVersion: agri.script/v1
+kind: Task
+metadata:
+  name: poultry-evening-feed
+  version: 1.0.0
+  owner: farm-ops
+  changeTicket: AGR-OPS-142
+spec:
+  requires:
+    cassette: {type: feed, capability: dispense_mass.v1}
+    operatorPolicy: supervisor_on_site
+    zones: [house-3-feed-lane]
+  limits: {travel_mps: 0.40, max_retries: 1, deadline_s: 1800}
+  preflight:
+    - carrier.safe_mode == READY
+    - cassette.latch == LOCKED
+    - feed.calibration.feed_lot == inventory.current_lot
+    - route.house_3_feed_lane.commissioned == true
+  steps:
+    - navigate: {route: house-3-feed-lane, speed_mps: 0.40, timeout_s: 500}
+    - for_each:
+        in: route.stops
+        as: stop
+        maximum_iterations: 24
+        do:
+          - dock: {station: "${stop.id}", tolerance_mm: 40, timeout_s: 45}
+          - dispense_mass: {kg: "${stop.kg}", max_s: 90, verify: loadcell}
+          - record: {event: feed_delivered, fields: [station, commanded_kg, actual_kg, scale_trace]}
+    - return_to: {location: feed-service-bay, timeout_s: 500}
+  on_fault:
+    - safe_stop: {reason: task_fault}
+    - notify: {role: stockperson, severity: high}
+  evidence:
+    retain: [recipe_hash, cassette_manifest, scale_trace, route_events, safety_events]

@@ -1,0 +1,37 @@
+apiVersion: agri.script/v1
+kind: Task
+metadata:
+  name: empty-bay-low-pressure-sanitation
+  version: 0.2.0
+  owner: hygiene-process-owner
+  changeTicket: AGR-CS-018
+spec:
+  requires:
+    cassette: {type: cleaning_sanitation, capability: apply_volume.v1}
+    operatorPolicy: supervisor_on_site
+    zones: [house-2-empty-service-bay]
+  limits: {travel_mps: 0.20, max_retries: 0, deadline_s: 1200}
+  preflight:
+    - carrier.safe_mode == READY
+    - cassette.latch == LOCKED
+    - zone.house_2_empty_service_bay.access_state == EXCLUDED
+    - chemical.sds_approval == VALID
+    - chemical.lot == approved_lots.current
+    - waste.route == APPROVED
+  steps:
+    - navigate: {route: house-2-service-entry, speed_mps: 0.20, timeout_s: 300}
+    - dock: {station: house-2-bay-start, tolerance_mm: 30, timeout_s: 60}
+    - apply_volume:
+        pattern: validated-fan-pass-a
+        volume_l: 8.0
+        pressure_bar: 5.0
+        max_s: 300
+        verify: [flow_meter, pressure_sensor, zone]
+    - record: {event: sanitation_applied, fields: [chemical_lot, dilution, volume_l, pressure_trace, zone, dwell_start]}
+    - return_to: {location: sanitation-service-bay, timeout_s: 300}
+  on_fault:
+    - park_tool: {}
+    - safe_stop: {reason: sanitation_fault}
+    - notify: {role: hygiene-process-owner, severity: high}
+  evidence:
+    retain: [recipe_hash, chemical_lot, dilution, flow_trace, pressure_trace, zone, dwell_start, safety_events]

@@ -1,0 +1,41 @@
+apiVersion: agri.script/v1
+kind: Task
+metadata:
+  name: supervised-egg-collection-round
+  version: 0.1.0
+  owner: poultry-process-owner
+  changeTicket: AGR-EGG-021
+spec:
+  requires:
+    cassette: {type: egg_collection, capability: collect_egg.v1}
+    operatorPolicy: supervisor_on_site
+    zones: [house-1-nest-bank-a]
+  limits: {travel_mps: 0.25, max_retries: 0, deadline_s: 2400}
+  preflight:
+    - carrier.safe_mode == READY
+    - cassette.latch == LOCKED
+    - egg.tray.clean_status == RELEASED
+    - route.house_1_nest_bank_a.commissioned == true
+    - process.egg_shell_treatment == DISABLED
+  steps:
+    - navigate: {route: house-1-nest-bank-a, speed_mps: 0.25, timeout_s: 600}
+    - for_each:
+        in: nest_bank.accessible_positions
+        as: nest
+        maximum_iterations: 48
+        do:
+          - inspect: {target: "${nest}", profile: nest-v1, timeout_s: 8}
+          - when:
+              condition: egg.detected && egg.quality_confidence >= 0.98 && animal.clearance_state == CLEAR
+              do:
+                - collect_egg: {target: egg, tray: traceable, max_pick_force_n: 8, timeout_s: 20}
+                - record: {event: egg_collected, fields: [nest, tray_slot, image_id, vacuum_trace]}
+              otherwise:
+                - record: {event: egg_skipped, fields: [nest, image_id, reason]}
+    - return_to: {location: egg-service-bay, timeout_s: 600}
+  on_fault:
+    - park_tool: {}
+    - safe_stop: {reason: egg_collection_fault}
+    - notify: {role: poultry-process-owner, severity: high}
+  evidence:
+    retain: [recipe_hash, tray_slots, image_id, vacuum_trace, safety_events]
