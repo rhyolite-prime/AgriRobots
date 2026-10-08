@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <title>EG-01 EGG COLLECTION CASSETTE — CONCEPT ARRANGEMENT</title>
+  <desc>AgriRobots AGR-200 engineering concept drawing. All dimensions millimetres unless noted.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto-start-reverse"><path d="M 0,0 L 9,4.5 L 0,9 z" class="dimfill"/></marker>
+    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e7ebef" stroke-width="0.7"/></pattern>
+    <style>
+      .border { fill:none; stroke:#18232e; stroke-width:2; }
+      .obj { fill:#edf3f5; stroke:#18232e; stroke-width:2.3; }
+      .dark { fill:#cbd9de; stroke:#18232e; stroke-width:2.3; }
+      .detail { fill:none; stroke:#415661; stroke-width:1.6; }
+      .hidden { fill:none; stroke:#71838d; stroke-width:1.3; stroke-dasharray:7 5; }
+      .center { fill:none; stroke:#3a94a8; stroke-width:1.1; stroke-dasharray:15 5 3 5; }
+      .dim { fill:none; stroke:#256f9b; stroke-width:1.25; marker-start:url(#arrow); marker-end:url(#arrow); }
+      .ext { fill:none; stroke:#256f9b; stroke-width:1; }
+      .dimfill { fill:#256f9b; }
+      .datum { fill:#e8f4ed; stroke:#137a4a; stroke-width:1.5; }
+      .safe { fill:#fdf3df; stroke:#ac6d12; stroke-width:1.8; stroke-dasharray:7 4; }
+      .label { font: 16px Arial, sans-serif; fill:#18232e; }
+      .small { font: 13px Arial, sans-serif; fill:#263842; }
+      .tiny { font: 11px Arial, sans-serif; fill:#263842; }
+      .note { font: 13px Arial, sans-serif; fill:#263842; }
+      .dimtxt { font: 15px Arial, sans-serif; font-weight:bold; fill:#256f9b; }
+      .view { font: bold 17px Arial, sans-serif; fill:#18232e; }
+      .title { font: bold 26px Arial, sans-serif; fill:#18232e; }
+      .tb { font: 12px Arial, sans-serif; fill:#18232e; }
+      .tbhead { font: bold 12px Arial, sans-serif; fill:#18232e; }
+    </style>
+  </defs>
+  <rect width="1600" height="1050" fill="#ffffff"/>
+  <rect x="30" y="30" width="1540" height="990" class="border"/>
+  <rect x="45" y="45" width="1510" height="810" fill="url(#grid)"/>
+  <text x="60" y="78" class="title">EG-01 EGG COLLECTION CASSETTE — CONCEPT ARRANGEMENT</text>
+  <text x="60" y="101" class="small">CONCEPT — NOT FOR FABRICATION · ALL DIMENSIONS IN mm · SCALE: diagrammatic, verify with released CAD</text>
+
+<text x="65" y="140" class="view">SIDE VIEW — arm stowed and pick envelope</text>
+<path d="M70 690 H920" class="detail"/>
+<rect x="150" y="455" width="540" height="170" rx="7" class="obj"/>
+<rect x="180" y="485" width="280" height="100" rx="5" fill="#ffffff" stroke="#415661" stroke-width="1.5"/>
+<path d="M480 455 V340 H565 V455" class="dark"/><path d="M522 340 L735 270 L775 315 L565 390" class="dark"/>
+<circle cx="775" cy="315" r="25" class="obj"/><path d="M790 332 q35 35 65 0" class="detail"/><path d="M803 332 q18 22 36 0" class="detail"/>
+<path d="M735 295 A 260 260 0 0 1 900 470" class="safe"/><text x="840" y="410" class="small">700 max arm reach</text>
+<rect x="150" y="625" width="540" height="30" class="dark"/>
+<text x="320" y="540" text-anchor="middle" class="label">removable egg trays</text><text x="522" y="330" text-anchor="middle" class="tiny">compact arm / Cartesian boom</text>
+<text x="805" y="280" class="tiny">compliant dual-cup end effector</text>
+<path d="M 150 655 V 720 M 690 655 V 720" class="ext"/><path d="M 150 720 H 690" class="dim"/><text x="420.0" y="713" class="dimtxt" text-anchor="middle">900 CASSETTE L</text><path d="M 150 455 H 110 M 150 625 H 110" class="ext"/><path d="M 110 455 V 625" class="dim"/><text x="102" y="540.0" class="dimtxt" text-anchor="middle" transform="rotate(-90 102 540.0)">600 MAX H ABOVE DATUM A</text><path d="M 522 340 V 380 M 855 340 V 380" class="ext"/><path d="M 522 380 H 855" class="dim"/><text x="688.5" y="373" class="dimtxt" text-anchor="middle">700 REACH FROM FRONT PLANE</text><path d="M 150 625 H 85 M 150 690 H 85" class="ext"/><path d="M 85 625 V 690" class="dim"/><text x="77" y="657.5" class="dimtxt" text-anchor="middle" transform="rotate(-90 77 657.5)">≤180 TOOL / BELOW-DATUM EXCLUDED</text><text x="160" y="750" class="small">Target mass: ≤65 kg empty / ≤85 kg filled. Food-contact path is restricted to tray + approved end-effector surfaces.</text>
+<!-- top view -->
+<text x="1010" y="140" class="view">TOP VIEW — cassette footprint</text>
+<rect x="1010" y="190" width="450" height="290" class="obj"/><rect x="1045" y="220" width="200" height="225" fill="#ffffff" stroke="#415661" stroke-width="1.5"/>
+<path d="M1270 335 H1450" class="safe"/><circle cx="1280" cy="335" r="20" class="dark"/><path d="M1280 335 A180 180 0 0 1 1435 445" class="safe"/>
+<text x="1145" y="338" text-anchor="middle" class="small">tray bay</text><text x="1370" y="265" text-anchor="middle" class="tiny">arm sweep within approved zone</text>
+<path d="M 1010 480 V 530 M 1460 480 V 530" class="ext"/><path d="M 1010 530 H 1460" class="dim"/><text x="1235.0" y="523" class="dimtxt" text-anchor="middle">900</text><path d="M 1010 190 H 975 M 1010 480 H 975" class="ext"/><path d="M 975 190 V 480" class="dim"/><text x="967" y="335.0" class="dimtxt" text-anchor="middle" transform="rotate(-90 967 335.0)">580</text><rect x="1000" y="595" width="480" height="155" class="safe"/><text x="1020" y="620" class="small">PROCESS HOLD POINTS</text><text x="1020" y="646" class="tiny">1. Validate nest geometry and animal response.</text><text x="1020" y="668" class="tiny">2. Limit gripper force/vacuum with feedback.</text><text x="1020" y="690" class="tiny">3. No egg shell treatment is specified on this sheet.</text><text x="1020" y="712" class="tiny">4. Segregate cracked/abnormal egg event and tray.</text>
+<text x="60" y="885" class="note">Arm/effector geometry is indicative. Detailed joint torque, collision, pinch, force, cleanability and food-contact design are pending.</text><text x="60" y="905" class="note">Do not infer any egg washing, UV, chemical or other shell sanitation process from this drawing.</text><text x="60" y="925" class="note">All dimensions are constrained by UCI-01 900 × 580 footprint and the carrier stability envelope.</text>
+  <g transform="translate(1010,870)">
+    <rect x="0" y="0" width="545" height="135" class="border" fill="#f8fafb"/>
+    <path d="M 0 30 H 545 M 0 75 H 545 M 170 0 V 135 M 365 0 V 135" class="detail"/>
+    <text x="10" y="20" class="tbhead">PROJECT / DRAWING</text><text x="180" y="20" class="tbhead">REV</text><text x="375" y="20" class="tbhead">STATUS</text>
+    <text x="10" y="52" class="tb">AgriRobots / AGR-200</text><text x="180" y="52" class="tb">A · 05 OCT 2026</text><text x="375" y="52" class="tb">CONCEPT</text>
+    <text x="10" y="96" class="tbhead">TITLE</text><text x="10" y="115" class="tb">EG-01 EGG COLLECTION CASSETTE</text>
+    <text x="180" y="96" class="tbhead">UNITS</text><text x="180" y="115" class="tb">mm / kg / V as marked</text>
+    <text x="375" y="96" class="tbhead">RELEASE</text><text x="375" y="115" class="tb">NOT FOR FABRICATION</text>
+  </g>
+</svg>
