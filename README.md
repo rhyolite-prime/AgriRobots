@@ -20,6 +20,7 @@ The carrier deliberately has a fixed protected mobility/safety/compute stack. Ea
 | [Controls, ROS 2, and Sapo-style DSL](docs/02_CONTROLS_SOFTWARE_AND_DSL.md) | ROS 2 architecture, independent safety boundary, module API, simulation, task DSL and examples |
 | [AgriScript DSL artifacts](dsl/README.md) | Draft JSON Schema plus feed, egg, sanitation, and conservative-weeding recipe examples |
 | [Execution plan and verification](docs/03_EXECUTION_PLAN_AND_VV.md) | 52-week staged plan, gates, pilot acceptance tests, risk register |
+| [Implementation plan](docs/08_IMPLEMENTATION_PLAN.md) | White-paper-to-build roadmap for the Virtual Lab, simulation/AI, AgriScript, edge runtime, hardware, and fleet workstreams |
 | [Preliminary BOM and make/buy plan](docs/04_PRELIMINARY_BOM.md) | Costed work packages and procurement-critical items |
 | [Hardware build guidelines](docs/07_HARDWARE_BUILD_GUIDE.md) | Workshop-level build sequence, tooling, wiring/bring-up rules, and gate-aligned checklists |
 | [Safety, food, and chemical compliance plan](docs/05_SAFETY_AND_COMPLIANCE.md) | Safety functions, standards map, sanitation/egg constraints, operating rules |
