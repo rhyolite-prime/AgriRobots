@@ -1,0 +1,92 @@
+# Planned ROS 2 Jazzy packages for the AP-01 edge system.
+#
+# safety_criticality explains what happens if the package is wrong:
+#   independent  - part of, or directly interfacing with, the safety controller
+#   bounded      - can command motion or a tool, but only inside enforced limits
+#   informational- reports state; a failure must degrade to inhibiting, never to permissive
+#
+# Source: docs/02_CONTROLS_SOFTWARE_AND_DSL.md section 2 and
+# docs/05_SAFETY_AND_COMPLIANCE.md.
+
+schemaVersion: agri.ros-package-plan/v1
+revision: 0.1.0
+status: planned
+
+packages:
+  - name: agri_bringup
+    responsibility: Start the configuration-specific graph from a signed inventory
+    safety_criticality: bounded
+    evidence: [VVT-EXE-*, VVT-CFG-*]
+    constraint: Activates only after carrier/module manifest checks pass
+
+  - name: agri_safety_bridge
+    responsibility: Read-only safety status plus a bounded request interface
+    safety_criticality: independent
+    evidence: [VVT-SAF-*]
+    constraint: Never substitutes for the hardwired stop; stale status inhibits the mission
+
+  - name: agri_base
+    responsibility: Kinematics, odometry and motor request shaping
+    safety_criticality: bounded
+    evidence: [VVT-NAV-*, VVT-SAF-*]
+    constraint: Limits cmd_vel; requires a 50 Hz command heartbeat; timeout means zero request
+
+  - name: agri_localization
+    responsibility: Wheel/IMU/lidar/GNSS fusion with an integrity monitor
+    safety_criticality: bounded
+    evidence: [VVT-NAV-*]
+    constraint: Publishes covariance and validity; invalid state maps to a controlled stop or approved degraded mode
+
+  - name: agri_nav
+    responsibility: Nav2 route following, speed zones and docking approach
+    safety_criticality: bounded
+    evidence: [VVT-NAV-*]
+    constraint: Cannot cross a geofence or exceed the cassette manifest speed
+
+  - name: agri_perception
+    responsibility: Detection, segmentation, tracking and quality gates
+    safety_criticality: informational
+    evidence: [VVT-WD-*, VVT-EG-*]
+    constraint: Emits measurement, covariance, model and data IDs; never a direct actuator command
+
+  - name: agri_module_manager
+    responsibility: Authenticate the cassette, load its manifest, check latch/CG/tool envelope
+    safety_criticality: bounded
+    evidence: [VVT-UCI-*]
+    constraint: Any mismatch disables the module and inhibits mission arming
+
+  - name: agri_executor
+    responsibility: Validate and execute the compiled task graph
+    safety_criticality: bounded
+    evidence: [VVT-DSL-*, VVT-EXE-*]
+    constraint: Allow-listed actions only; durable append-only event journal
+
+  - name: agri_recorder
+    responsibility: Selective rosbag/event/video logging with a retention policy
+    safety_criticality: informational
+    evidence: [VVT-CFG-*]
+    constraint: Priority storage quota; recorder failure must be visible to the operator
+
+  - name: agri_fd
+    responsibility: FD-01 feed cassette behaviour controller
+    safety_criticality: bounded
+    evidence: [VVT-FD-*]
+    constraint: Separate process and MCU watchdog; deactivate drives the tool to a physical safe state
+
+  - name: agri_eg
+    responsibility: EG-01 egg cassette behaviour controller
+    safety_criticality: bounded
+    evidence: [VVT-EG-*]
+    constraint: Collection and traceability only; no shell treatment action exists
+
+  - name: agri_cs
+    responsibility: CS-01 cleaning/sanitation cassette behaviour controller
+    safety_criticality: bounded
+    evidence: [VVT-CS-*]
+    constraint: Approved zone, metered volume and containment evidence required
+
+  - name: agri_wd
+    responsibility: WD-01 weeding cassette behaviour controller
+    safety_criticality: bounded
+    evidence: [VVT-WD-*]
+    constraint: Sensing/shadow mode until the G7 actuation gate passes; abstention on low confidence

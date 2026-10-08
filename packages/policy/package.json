@@ -1,0 +1,21 @@
+{
+  "name": "@agrirobots/policy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Capability allow-list and approval-gate policy checks applied before an AgriScript recipe may be signed or executed.",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "data"
+  ],
+  "dependencies": {
+    "@agrirobots/compiler-core": "*",
+    "@agrirobots/contracts": "*",
+    "@agrirobots/domain-model": "*",
+    "yaml": "^2.6.1"
+  }
+}

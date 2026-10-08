@@ -26,6 +26,38 @@ The carrier deliberately has a fixed protected mobility/safety/compute stack. Ea
 | [Safety, food, and chemical compliance plan](docs/05_SAFETY_AND_COMPLIANCE.md) | Safety functions, standards map, sanitation/egg constraints, operating rules |
 | [Site-discovery questionnaire](docs/06_SITE_DISCOVERY_QUESTIONNAIRE.md) | The values needed to freeze a production design |
 | [Drawing index](drawings/README.md) | Vector drawing sheets and drawing-control conventions |
+| [Contributing guide](CONTRIBUTING.md) | Repository boundaries, verification commands, and change/evidence rules |
+
+## Implementation workspace
+
+The design package above is now backed by a scaffolded monorepo. Code lives in
+explicit boundaries so the Virtual Lab, compiler, simulation, edge runtime and
+fleet services stay separable — and so the safety controller stays independent of
+all of them.
+
+| Boundary | Status | Purpose |
+| --- | --- | --- |
+| [`packages/contracts`](packages/contracts/README.md) | implemented (types + schemas) | Versioned event, artifact and configuration contracts |
+| [`packages/domain-model`](packages/domain-model/README.md) | implemented | AP-01/UCI-01/cassette identifiers and `agri.module/v1` manifest validation |
+| [`packages/compiler-core`](packages/compiler-core/README.md) | partial | Strict YAML loading and `agri.script/v1` schema validation; semantic checks and the behaviour-tree IR are not implemented |
+| [`packages/policy`](packages/policy/README.md) | partial | Draft capability allow-list with gate and approval checks |
+| [`apps/virtual-lab`](apps/virtual-lab/README.md) | placeholder | Nuxt 4 assembly, manifest, recipe-review and twin-export studio |
+| [`packages/asset-import`](packages/asset-import/README.md) | placeholder | GLTF/URDF ingestion and asset validation |
+| [`ros_ws`](ros_ws/README.md) | placeholder | ROS 2 Jazzy edge packages, with the planned decomposition recorded |
+| [`simulation`](simulation/README.md) | placeholder | Gazebo worlds, replay and power/safety HIL |
+| [`ai`](ai/README.md) | placeholder | Dataset governance, training and evaluation |
+| [`fleet`](fleet/README.md) | placeholder | Non-safety registry, staged rollout and audit |
+| [`recipes`](recipes/README.md) | placeholder | Approved and signed recipes |
+| [`test_evidence`](test_evidence/README.md) | template only | `VVT-*` records, reports and configuration hashes |
+
+```bash
+npm ci            # install workspace dependencies
+npm run verify    # structure, links, types, lint, format, tests
+```
+
+Rules for changing any of it — boundaries, fail-closed validation, versioned
+contracts, evidence and commit conventions — are in
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Physical concept at a glance
 

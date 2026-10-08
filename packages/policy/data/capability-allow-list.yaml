@@ -1,0 +1,71 @@
+# AMARS capability allow-list (draft)
+#
+# Only capabilities listed here may appear in a signed recipe or an issued
+# module manifest. A capability identifier is a claim about approved function;
+# it is never itself permission to energise a tool. Physical permission comes
+# from the independent safety controller and the cassette's inspected manifest.
+#
+# Deliberately absent, and must not be added without a separate validated
+# process, hazard analysis, legal/process-owner approval and its own gate:
+#   - egg shell washing, sanitising, coating or any shell treatment
+#   - herbicide, pesticide or other crop-protection chemical application
+#   - unvalidated mechanical weed actuation outside a guarded plot
+#
+# Source of the entries below: docs/02_CONTROLS_SOFTWARE_AND_DSL.md,
+# docs/03_EXECUTION_PLAN_AND_VV.md gates G5-G7 and dsl/examples/*.yaml.
+
+schemaVersion: agri.policy.capability-allow-list/v1
+revision: 0.1.0
+status: draft
+
+capabilities:
+  - id: dispense_mass.v1
+    cassetteType: feed
+    hazardClass: conditional_task
+    minimumGate: G5
+    processApprovalRequired: false
+    description: >-
+      Calibrated mass dispensing with load-cell verification at a commissioned
+      station. Requires a filled-mass/CG re-weigh, dose agreement check and
+      no-double-dose behaviour before release.
+
+  - id: apply_volume.v1
+    cassetteType: cleaning_sanitation
+    hazardClass: conditional_task
+    minimumGate: G5
+    processApprovalRequired: true
+    description: >-
+      Metered liquid application in an approved, empty or controlled zone.
+      Requires the chemical/food/feed process owner, SDS and dilution route,
+      containment, cleanability and waste-disposal evidence.
+
+  - id: collect_egg.v1
+    cassetteType: egg_collection
+    hazardClass: conditional_task
+    minimumGate: G6
+    processApprovalRequired: true
+    description: >-
+      Egg picking, placement and traceability only. Requires end-effector force,
+      crack-rate, materials, animal-welfare and food-safety review. Shell
+      treatment is a separate capability that does not exist in this list.
+
+  - id: inspect_plant.v1
+    cassetteType: weeding
+    hazardClass: sensing_only
+    minimumGate: G2
+    processApprovalRequired: false
+    description: >-
+      Passive crop and weed sensing with uncertainty, model ID and calibration
+      reporting. Shadow-mode only: perception output may not command an
+      actuator.
+
+  - id: mechanical_weed.v1
+    cassetteType: weeding
+    hazardClass: actuation_gated
+    minimumGate: G7
+    processApprovalRequired: true
+    description: >-
+      Guarded mechanical weed actuation. Requires crop-specific held-out
+      metrics, confidence calibration with abstention, latency, exclusion
+      radius, placement and force evidence, plus agronomy and crop-owner
+      approval. Remains disabled otherwise.

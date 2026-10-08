@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agrirobots.local/schema/agri.event.v1.schema.json",
+  "title": "AMARS journal event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "eventId",
+    "timestamp",
+    "source",
+    "sequence",
+    "runId",
+    "safetyState",
+    "quality",
+    "configuration",
+    "kind",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "agri.event/v1" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "monotonicNs": { "type": "integer", "minimum": 0 },
+    "source": {
+      "type": "string",
+      "enum": [
+        "virtual-lab",
+        "compiler",
+        "policy-service",
+        "simulator",
+        "replay",
+        "hil-bench",
+        "edge-executor",
+        "module-controller",
+        "safety-controller",
+        "operator-hmi",
+        "fleet-service"
+      ]
+    },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "runId": { "type": "string", "minLength": 1 },
+    "safetyState": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "SAFE_STOP",
+        "READY",
+        "MANUAL_SLOW",
+        "AUTO_TRAVEL",
+        "AUTO_TASK",
+        "SERVICE"
+      ]
+    },
+    "quality": { "type": "string", "enum": ["GOOD", "UNCERTAIN", "BAD", "STALE"] },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["carrierId"],
+      "properties": {
+        "carrierId": { "type": "string", "minLength": 1 },
+        "cassetteSerial": { "type": "string", "minLength": 1 },
+        "firmwareVersion": { "type": "string", "minLength": 1 },
+        "rosBundleHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "mapRevision": { "type": "string", "minLength": 1 },
+        "calibrationBundleHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "modelVersion": { "type": "string", "minLength": 1 },
+        "recipeHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "kind": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" },
+    "payload": { "type": "object" }
+  }
+}

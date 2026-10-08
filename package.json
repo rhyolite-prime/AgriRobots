@@ -1,0 +1,36 @@
+{
+  "name": "agrirobots",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AMARS / AgriRobots modular agricultural robotics platform: design package, Virtual Lab, AgriScript toolchain, digital twin, edge runtime and fleet workspaces.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "workspaces": [
+    "packages/contracts",
+    "packages/domain-model",
+    "packages/compiler-core",
+    "packages/policy"
+  ],
+  "scripts": {
+    "check:tree": "node scripts/check-tree.mjs",
+    "check:links": "node scripts/check-doc-links.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "verify": "npm run check:tree && npm run check:links && npm run typecheck && npm run lint && npm run format:check && npm run test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1",
+    "vitest": "^2.1.8"
+  }
+}

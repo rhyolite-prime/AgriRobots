@@ -1,0 +1,19 @@
+node_modules
+dist
+coverage
+.nuxt
+.output
+package-lock.json
+
+# Authored engineering documents keep their own hand formatting.
+docs
+drawings
+dsl
+test_evidence
+recipes
+simulation
+ai
+fleet
+ros_ws
+apps
+*.md

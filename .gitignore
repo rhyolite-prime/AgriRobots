@@ -1,0 +1,56 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+out/
+target/
+*.tsbuildinfo
+
+# Nuxt / Vite / web app artifacts
+.nuxt/
+.output/
+.vite/
+.cache/
+.turbo/
+
+# Test and coverage artifacts
+coverage/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Python
+.venv/
+__pycache__/
+*.egg-info/
+
+# ROS 2 workspace build output
+ros_ws/build/
+ros_ws/install/
+ros_ws/log/
+
+# Recordings, datasets and large binaries stay out of Git
+*.bag
+*.mcap
+*.db3
+*.mp4
+*.avi
+*.pcd
+*.ply
+ai/datasets/raw/
+ai/datasets/derived/
+simulation/gazebo/recordings/
+test_evidence/artifacts/
+
+# Local environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

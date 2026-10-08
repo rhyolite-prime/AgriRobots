@@ -1,0 +1,15 @@
+{
+  "name": "@agrirobots/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Versioned event, artifact and configuration contracts shared by the Virtual Lab, simulation, edge runtime and fleet services.",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "schemas"
+  ]
+}

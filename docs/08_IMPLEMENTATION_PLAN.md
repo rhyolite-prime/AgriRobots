@@ -138,6 +138,25 @@ test_evidence/                 # VVT-* records, reports and configuration hashes
 
 The exact language and build tooling may be selected at project bootstrap, but each boundary must have a versioned contract and a test harness. A UI must not import ROS internals directly; an edge process must not trust UI state; and a safety controller must not depend on either.
 
+### 3.2 Scaffold status
+
+The repository boundaries above are scaffolded and enforced in CI by
+`npm run check:tree` and `npm run check:links`. Status as at bootstrap:
+
+| Boundary | Status | Note |
+| --- | --- | --- |
+| `packages/contracts` | implemented | Types plus `agri.event/v1` and `agri.artifact/v1` JSON Schemas |
+| `packages/domain-model` | implemented | Identifier vocabulary and fail-closed `agri.module/v1` validation |
+| `packages/compiler-core` | partial | Strict YAML load (duplicate and merge keys rejected) and `agri.script/v1` validation; `compileToIr()` raises `NotImplementedError` |
+| `packages/policy` | partial | Draft allow-list with hazard class, minimum gate and approval checks |
+| `apps/virtual-lab`, `packages/asset-import`, `ros_ws`, `simulation`, `ai`, `fleet`, `recipes`, `test_evidence` | placeholder | README records scope, entry criteria and boundaries; no implementation yet |
+
+Deliberate choices at bootstrap: one strict YAML loader shared by recipes and
+policy data; one Ajv 2020-12 validator against the published schemas; no
+signing, no network, no ROS dependency; and no capability for egg shell
+treatment, chemical application or unvalidated weed actuation, with a test that
+fails if one is added without review.
+
 ## 4. Workstreams and implementation tasks
 
 ### WS-A — requirements, safety, and configuration control

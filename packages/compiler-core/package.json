@@ -1,0 +1,20 @@
+{
+  "name": "@agrirobots/compiler-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AgriScript front end: duplicate-key-safe YAML loading, JSON Schema validation and the deterministic IR entry point.",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@agrirobots/contracts": "*",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "yaml": "^2.6.1"
+  }
+}
