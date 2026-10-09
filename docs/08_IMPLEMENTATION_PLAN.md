@@ -110,6 +110,7 @@ packages/
   compiler-core/               # AgriScript AST, semantic checks, deterministic IR
   contracts/                   # versioned JSON/Protobuf action/state/event contracts
   policy/                      # capability, ODD, operator and chemical/food rules
+  engine/                      # agri.task/v1 interpreter, safety gate, world models
 ros_ws/
   src/agri_bringup/
   src/agri_safety_bridge/
@@ -141,16 +142,19 @@ The exact language and build tooling may be selected at project bootstrap, but e
 ### 3.2 Scaffold status
 
 The repository boundaries above are scaffolded and enforced in CI by
-`npm run check:tree` and `npm run check:links`. Status as at bootstrap:
+`npm run check:tree` and `npm run check:links`. Status as at the first ARACNID
+vertical slice (see `docs/09` for the toolchain and `docs/10` for the machine):
 
 | Boundary | Status | Note |
 | --- | --- | --- |
 | `packages/contracts` | implemented | Types plus `agri.event/v1` and `agri.artifact/v1` JSON Schemas |
 | `packages/domain-model` | implemented | Identifier vocabulary and fail-closed `agri.module/v1` validation |
-| `packages/compiler-core` | partial | Strict YAML load (duplicate and merge keys rejected) and `agri.script/v1` validation; `compileToIr()` raises `NotImplementedError` |
-| `packages/policy` | partial | Draft allow-list with hazard class, minimum gate and approval checks |
+| `packages/compiler-core` | implemented | Strict YAML load (duplicate and merge keys rejected), `agri.script/v1` validation, and the `agri.task/v1` lexer, parser and deterministic canonical IR |
+| `packages/policy` | implemented | Capability allow-list 0.2.0 with hazard class, minimum gate and approval checks, plus `compileAgriTaskSource()` as the single compile entry point |
+| `packages/engine` | implemented | Interpreter over the canonical IR, independent safety model, permit and resource ledgers, journal with a trace hash, checkpoints and resume, and the ARACNID kinematic world |
 | `dsl/grammar` | implemented | `agri.task/v1` BNF, conformance examples and `npm run check:grammar` |
-| `apps/virtual-lab`, `packages/asset-import`, `ros_ws`, `simulation`, `ai`, `fleet`, `recipes`, `test_evidence` | placeholder | README records scope, entry criteria and boundaries; no implementation yet |
+| `apps/virtual-lab` | implemented, first cut | Nuxt 4 lab: compiles a task from the closed shelf, executes it against the ARACNID twin in Node and replays the journal, the safety functions and the twin frames. No ROS, no hardware, no signing |
+| `packages/asset-import`, `ros_ws`, `simulation`, `ai`, `fleet`, `recipes`, `test_evidence` | placeholder | README records scope, entry criteria and boundaries; no implementation yet |
 
 Deliberate choices at bootstrap: one strict YAML loader shared by recipes and
 policy data; one Ajv 2020-12 validator against the published schemas; no

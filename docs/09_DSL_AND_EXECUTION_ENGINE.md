@@ -1,6 +1,6 @@
 # 09 — AgriScript grammar and execution engine
 
-**Document:** AGR-DSL-090 · **Revision:** A · **Status:** design baseline for implementation  
+**Document:** AGR-DSL-090 · **Revision:** B · **Status:** design baseline; E1–E5, E7 and E9 are implemented in TypeScript (§11)  
 **Grammar:** [`dsl/grammar/agri.task.v1.bnf`](../dsl/grammar/agri.task.v1.bnf) (`agri.task/v1`)  
 **Engine:** `agri-engine` — the robotics sibling of the [Sapo DSL execution engine](https://github.com/rhyolite-prime/SapoEngine)  
 **Depends on:** [`02_CONTROLS_SOFTWARE_AND_DSL.md`](02_CONTROLS_SOFTWARE_AND_DSL.md), [`05_SAFETY_AND_COMPLIANCE.md`](05_SAFETY_AND_COMPLIANCE.md), [`08_IMPLEMENTATION_PLAN.md`](08_IMPLEMENTATION_PLAN.md) §4 WS-C
@@ -429,6 +429,16 @@ can be reproduced. Journal write failure is visible to the operator and
 inhibiting for further actuation — an unaudited action is not an acceptable
 action.
 
+Ordering contract: the journal is appended in **causal** order — the order the
+interpreter decided things — and its `sequence` is strictly increasing. At a
+parallel join, branches are flushed in branch order, so mission time is not
+monotonic across the join; a consumer that scrubs by time sorts on
+(`elapsedMs`, `sequence`) rather than assuming the append order is a timeline.
+The twin-frame list a mission returns is a playback timeline and is therefore
+ordered by mission time, with frames sharing a timestamp kept in emit order.
+`packages/engine` implements both halves of this contract and
+`apps/virtual-lab` relies on it.
+
 ## 6. Worked execution: `poultry-evening-feed.agri`
 
 | # | Activation | Gate | Signal | Journal |
@@ -548,20 +558,35 @@ evidence that a dose was delivered.
 
 ## 11. Work packages
 
-| WP | Content | Exit criterion | Plan link |
-| --- | --- | --- | --- |
-| E1 | Lexer + parser for `agri.task/v1`; AST with source spans | Both `.agri` examples parse; every invalid corpus case refused with code + node id | [08](08_IMPLEMENTATION_PLAN.md) §4 WS-C 1–2 |
-| E2 | `agri.expr/v1` compiler (units, freshness, closed built-ins, state roots) | Expressions compile once, evaluate deterministically, reject unresolved roots and unit errors | WS-C 1, 3 |
-| E3 | `TaskValidator` with S1–S10 + registry/manifest/zone/evidence checks | Validator collects all issues; the four YAML recipes and two `.agri` tasks pass; corpus failures are precise | WS-C 3 |
-| E4 | Canonical IR `agri.bt-ir/v0` + hashing + signing envelope | Byte-stable across runs and implementations; `agric compile`/`sign`/`diff` work | WS-C 4–5 |
-| E5 | Interpreter: frames, signals, deadlines, retries, guards, permits, parallel arbitration | Golden traces match for nominal and every fault scenario under an injected clock | WS-C 6–7 |
-| E6 | `SafetyGate` + `CapabilityRegistry` + `PhysicalActionBridge` (ROS 2) | No physical dispatch without a gate ALLOW; denial and stale-input paths tested on HIL | WS-E 2–4 |
-| E7 | `MissionStore`, checkpoints, resume protocol, journal | Restart mid-mission resumes only after re-verification; safety-stop missions are non-resumable | WS-E 5–6 |
-| E8 | `agric` CLI + CI integration + conformance corpus | `agric validate --strict --json` gates merges; corpus is green in CI on both implementations | WS-C, WS-H 1–2 |
-| E9 | Virtual Lab integration (WASM build of the same compiler core) | The browser shows the identical IR hash and validation issues as CI | WS-B |
+| WP | Content | Exit criterion | Plan link | Status |
+| --- | --- | --- | --- | --- |
+| E1 | Lexer + parser for `agri.task/v1`; AST with source spans | Both `.agri` examples parse; every invalid corpus case refused with code + node id | [08](08_IMPLEMENTATION_PLAN.md) §4 WS-C 1–2 | implemented — [`packages/compiler-core`](../packages/compiler-core/README.md) |
+| E2 | `agri.expr/v1` compiler (units, freshness, closed built-ins, state roots) | Expressions compile once, evaluate deterministically, reject unresolved roots and unit errors | WS-C 1, 3 | implemented — `compiler-core` compiles, [`packages/engine`](../packages/engine/README.md) evaluates |
+| E3 | `TaskValidator` with S1–S10 + registry/manifest/zone/evidence checks | Validator collects all issues; the four YAML recipes and two `.agri` tasks pass; corpus failures are precise | WS-C 3 | implemented, S1–S11, all issues collected |
+| E4 | Canonical IR `agri.bt-ir/v0` + hashing + signing envelope | Byte-stable across runs and implementations; `agric compile`/`sign`/`diff` work | WS-C 4–5 | partial — canonical IR and `sha256` hashes are byte-stable and pinned by golden tests; **no signing envelope yet** |
+| E5 | Interpreter: frames, signals, deadlines, retries, guards, permits, parallel arbitration | Golden traces match for nominal and every fault scenario under an injected clock | WS-C 6–7 | implemented — eight ARACNID scenarios plus six injectable fault kinds under a simulated clock |
+| E6 | `SafetyGate` + `CapabilityRegistry` + `PhysicalActionBridge` (ROS 2) | No physical dispatch without a gate ALLOW; denial and stale-input paths tested on HIL | WS-E 2–4 | partial — gate, independent safety model, capability allow-list and degraded modes are implemented and tested; **no ROS 2 bridge and no HIL evidence** |
+| E7 | `MissionStore`, checkpoints, resume protocol, journal | Restart mid-mission resumes only after re-verification; safety-stop missions are non-resumable | WS-E 5–6 | partial — versioned checkpoints, resume with re-verification and refusal after SAFE_STOP are implemented in memory; **no durable store (SQLite) yet** |
+| E8 | `agric` CLI + CI integration + conformance corpus | `agric validate --strict --json` gates merges; corpus is green in CI on both implementations | WS-C, WS-H 1–2 | partial — CI gates merges on the TypeScript implementation; **no `agric` binary and no second (C++) implementation to compare against** |
+| E9 | Virtual Lab integration (WASM build of the same compiler core) | The browser shows the identical IR hash and validation issues as CI | WS-B | implemented without WASM — [`apps/virtual-lab`](../apps/virtual-lab/README.md) compiles and executes in Node on the server and shows the identical IR hash, journal hash and validation issues; the browser renders and never executes |
 
 Sequencing: E1 → E2 → E3 → E4 in that order; E5 needs E4; E6/E7 need E5 and the
 hardware bring-up ladder; E8 runs continuously from E1; E9 after E4.
+
+Two deliberate deviations from this table, both recorded so they are decisions
+rather than drift:
+
+1. **E9 without WASM.** The plan assumed a browser-side build of the compiler
+   core. The lab instead runs the same `@agrirobots/compiler-core`,
+   `@agrirobots/policy` and `@agrirobots/engine` in Node behind an API, and the
+   browser receives a journal, twin frames and a summary. This keeps one
+   implementation (no second toolchain to prove equivalent), keeps the executor
+   off the client, and still shows the identical IR hash. A WASM build stays
+   open for offline authoring, where no server is available.
+2. **No signing yet.** The IR is hashed and the hash is quoted everywhere, but
+   nothing is signed and no deployment path trusts a hash alone. Signing belongs
+   to E4's envelope and to the OTA rules in `docs/08` §4 WS-H, and must land
+   before any artifact reaches a robot.
 
 ## 12. Open decisions
 

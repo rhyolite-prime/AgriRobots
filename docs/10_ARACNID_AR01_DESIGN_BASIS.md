@@ -207,6 +207,35 @@ egg against the manual baseline**, not throughput in a brochure.
 8. Local food-safety and animal-welfare rules for automated collection and for
    per-egg traceability claims.
 
+### 9.1 What the simulation currently assumes
+
+`packages/engine/src/aracnid-world.ts` (constant block `ARACNID`) and
+[`apps/virtual-lab`](../apps/virtual-lab/README.md) execute against placeholders
+for the assumptions above. They are recorded here so that a site answer replaces
+a named number rather than being rediscovered, and so that no result from the
+virtual lab is mistaken for a measured one.
+
+| Topic | Value encoded today | Closes with |
+| --- | --- | --- |
+| Nest bank (1) | One bank 0.85 m ahead of the docked rover, 1.2 m wide, 0.35 m deep, 0.45 m high, 16 slots, single tier, no lip or litter model | Nest survey: count, spacing, tiers, lip, litter depth |
+| Nest geometry (1) | Two layouts, selectable in the lab: `arc` — slots on a 0.8 m perimeter arc so all eight shoulders reach; `straight` — one 1.2 m run so only the nearest hands reach and the others abstain | Which of the two the pilot house actually presents |
+| Aisle and deployment (2) | Rover docks at the nest face and deploys the arm ring there; no doorway or aisle traversal is modelled | Minimum aisle and doorway measurements |
+| Tray standard (3) | 30-egg flats, six trays, tilt-indexed, 180-egg magazine | Tray standard in use and staff handling |
+| Vision confidence (6) | Threshold 0.8; per-slot confidence drawn from the run seed; the `low-confidence` scenario uses 0.62 and abstains | Measured confidence and abstention rate at the nest face |
+| Tip-over trip | 6 deg placeholder, with the task guard at 4 deg in `dsl/examples/aracnid-egg-collection.agri` (defence in depth: the guard trips first) | Static stability and CoG analysis for the deployed ring, then the AR-01 tilt test |
+| Hand to egg assignment | Global: hands are offered eggs from one shared pool, so any hand may take any egg | Nest geometry (1) — a real cell constrains which hand reaches which nest |
+| Arm envelope | Ring radius 0.31 m, ring height 620 mm, reach 620 mm, shoulder yaw +/-95 deg, elbow -20 to +110 deg, wrist 75 deg, 3 DOF per arm | G-B1 bench: reach, stiffness, repeatability |
+| End effector | Compliant suction cup, 38 mm diameter, 12-25 kPa (nominal 18), force limits 6 N approach / 12 N lift / 30 N crush, 0.12 kg payload per hand | G-B1 bench: seal, force and drop tests on graded eggs |
+| Motion | 0.60 m/s transit, 0.35 m/s approach, 0.15 m/s at the nest | Site speed limits and the aisle survey |
+| Power (7) | 5 760 Wh usable from 92 % state of charge, decremented by motion and vacuum | Sortie length the operation wants, and the charging position |
+| Egg properties | 55-75 g, three grades, shell tolerance below the nominal squeeze produces a crack that is counted against the robot | Flock and grading data |
+| Physics | Kinematic twin only: poses, states and timings, no rigid-body dynamics, no contact model, no bird behaviour | `simulation/gazebo` and the HIL bench (both still placeholders) |
+
+Every one of these is reachable from the lab without editing code: the scenario
+picker, the seed, the nest layout, the egg count and the fault injector are the
+five knobs, and the fault kinds are seal loss, vacuum decay, force overrun,
+worker presence, tilt and a stale safety heartbeat.
+
 Until these are answered, ARACNID is a **bench and simulation programme**. That
 is not a delay: the hand bench (G-B1) and the DSL/engine work are the two things
 that most reduce programme risk, and neither needs a site.

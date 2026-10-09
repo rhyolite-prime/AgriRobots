@@ -52,9 +52,10 @@ all of them.
 | --- | --- | --- |
 | [`packages/contracts`](packages/contracts/README.md) | implemented (types + schemas) | Versioned event, artifact and configuration contracts |
 | [`packages/domain-model`](packages/domain-model/README.md) | implemented | AP-01/UCI-01/cassette identifiers and `agri.module/v1` manifest validation |
-| [`packages/compiler-core`](packages/compiler-core/README.md) | partial | Strict YAML loading and `agri.script/v1` schema validation; semantic checks and the behaviour-tree IR are not implemented |
-| [`packages/policy`](packages/policy/README.md) | partial | Draft capability allow-list with gate and approval checks |
-| [`apps/virtual-lab`](apps/virtual-lab/README.md) | placeholder | Nuxt 4 assembly, manifest, recipe-review and twin-export studio |
+| [`packages/compiler-core`](packages/compiler-core/README.md) | implemented | Strict YAML loading, `agri.script/v1` schema validation, and the `agri.task/v1` lexer, parser, semantic checks (S1–S11) and canonical IR |
+| [`packages/policy`](packages/policy/README.md) | implemented | Capability allow-list 0.2.0 with hazard class, gate and approval checks, and `compileAgriTaskSource()` |
+| [`packages/engine`](packages/engine/README.md) | implemented | The `agri.task/v1` execution engine: interpreter, independent safety model, permits and resources, journal, checkpoints and the ARACNID kinematic world |
+| [`apps/virtual-lab`](apps/virtual-lab/README.md) | implemented, first cut | Nuxt 4 lab: compile a task, run it against the ARACNID twin in Node, replay the journal, safety functions and twin frames |
 | [`packages/asset-import`](packages/asset-import/README.md) | placeholder | GLTF/URDF ingestion and asset validation |
 | [`ros_ws`](ros_ws/README.md) | placeholder | ROS 2 Jazzy edge packages, with the planned decomposition recorded |
 | [`simulation`](simulation/README.md) | placeholder | Gazebo worlds, replay and power/safety HIL |
@@ -66,7 +67,17 @@ all of them.
 ```bash
 npm ci            # install workspace dependencies
 npm run verify    # structure, links, types, lint, format, tests
+npm run dev --workspace apps/virtual-lab   # the Virtual Lab on http://localhost:3000
 ```
+
+The ARACNID round is executable today, end to end and without hardware:
+`dsl/examples/aracnid-egg-collection.agri` compiles to a canonical IR with a
+pinned `sha256`, the engine runs it against the eight-hand kinematic twin in
+eight scenarios (nominal, low confidence, seal loss, cracked egg, worker
+presence, tilt breach, full magazine, too few eggs) with six injectable fault
+kinds on top, and the lab replays the result. Everything physical is still a placeholder — the numbers
+behind the twin are listed against the measurements that close them in
+[docs/10 §9.1](docs/10_ARACNID_AR01_DESIGN_BASIS.md).
 
 Rules for changing any of it — boundaries, fail-closed validation, versioned
 contracts, evidence and commit conventions — are in
