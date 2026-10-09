@@ -1,0 +1,101 @@
+// Grammar conformance example for agri.task/v1.
+// Textual twin of examples/poultry-evening-feed.yaml: same task, same limits,
+// same evidence. Hashes below are placeholders, not real calibration data.
+
+meta {
+  owner "farm-ops";
+  change_ticket "AGR-OPS-142";
+  description "Evening feed round in house 3 with load-cell verified dosing.";
+}
+
+task poultry-evening-feed@1.0.0 {
+  requires {
+    cassette FD-01 with dispense_mass.v1;
+    operator supervisor_on_site;
+    zones house-3-feed-lane;
+    route house-3-feed-lane commissioned;
+    calibration sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba;
+  }
+
+  limits {
+    travel_speed   = 0.40 m/s;
+    task_deadline  = 30 min;
+    dock_tolerance = 40 mm;
+    tool_timeout   = 90 s;
+    max_mass       = 125 kg;
+    max_retries    = 1 count;
+  }
+
+  preflight {
+    safety.mode == #READY                                  @ within 500 ms;
+    cassette.latch == #LOCKED                              @ within 500 ms;
+    cassette.serial == inventory.expected_cassette_serial  @ within 1 s;
+    cassette.calibration.feed_lot == inventory.current_lot @ within 1 s;
+    route.house_3_feed_lane.commissioned == true           @ within 10 s;
+    battery.state_of_charge >= 35 %                        @ within 2 s;
+  }
+
+  steps {
+    start_round: record task.started {
+      task = task.name;
+      run = task.run_id;
+      zone = zone.current_id;
+    };
+
+    to_lane: move along house-3-feed-lane at 0.40 m/s within 500 s;
+
+    feed_stops: for_each $stop in route.house_3_feed_lane.stops at_most 24 {
+      at_station: dock at $stop.id tolerance 40 mm within 45 s;
+
+      dispense: actuate dispense_mass.v1 (
+                  station = $stop.id,
+                  mass    = $stop.mass,
+                  rate    = 0.30 kg/s
+                )
+                within 90 s
+                verify {
+                  tool.dispensed_mass == $stop.mass @ within 2 s;
+                  tool.scale_traceable == true      @ within 2 s;
+                  tool.hopper_level >= 5 kg         @ within 2 s;
+                }
+                on_mismatch retry at_most 1 times backoff 3 s
+                            idempotency_key task.run_id + ":" + $stop.id
+                idempotency_key task.run_id + ":" + $stop.id;
+
+      log_dose: record feed.delivered {
+        station        = $stop.id;
+        commanded_mass = $stop.mass;
+        actual_mass    = tool.dispensed_mass;
+        scale_trace    = tool.scale_trace_id;
+        duration       = tool.last_action_duration;
+      };
+    } on_exhausted fault;
+
+    to_bay: return_to feed-service-bay within 500 s;
+
+    close_round: record task.completed {
+      stations = count_of(route.house_3_feed_lane.stops);
+      total    = sum(tool.dispensed_mass);
+    };
+
+    done: finish success message = "Feed round complete";
+  }
+
+  on_fault {
+    halt: safe_stop reason = task.fault_reason;
+    park: park_tool;
+    tell: notify stockperson severity high "Feed round faulted; inspect before resuming.";
+    log:  record task.faulted {
+      reason = task.fault_reason;
+      node   = task.fault_node;
+      state  = safety.mode;
+    };
+    stop: finish failed TASK_FAULT message = task.fault_reason;
+  }
+
+  evidence {
+    retain recipe_hash, cassette_manifest, scale_trace, route_events, safety_events, journal;
+    privacy animal_records;
+    retention_days 365;
+  }
+}

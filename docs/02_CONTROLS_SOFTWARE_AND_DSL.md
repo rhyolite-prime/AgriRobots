@@ -109,7 +109,7 @@ The manifest is an engineering assertion, not trust by itself: it is issued only
 
 The requested “Sapo DSL” behavior is implemented as an **internal, typed, declarative recipe language**. It intentionally contains no arbitrary shell/Python evaluation. A compiler turns it into a versioned, allow-listed behavior tree (e.g. BehaviorTree.CPP XML or an equivalent internal representation). That makes recipes reviewable, portable across approved modules, and bounded by policy.
 
-> There is no assumed API or compatibility with an external product called Sapo. If a specific Sapo grammar/runtime is required, treat it as an integration requirement and write an adapter after its specification/licensing is supplied.
+> The reference engine is the sibling project **Sapo Engine** ([`rhyolite-prime/SapoEngine`](https://github.com/rhyolite-prime/SapoEngine)): a DSL-driven execution engine that replaced hand-written USSD `if/else` session managers with validated blueprints. `agri-engine` reuses its architecture (parse-once AST, compiled expressions, capability registry with static refusal, durable suspension, static graph validation, deterministic CLI) but is a separate library: a robot binary must not contain the USSD engine's `script`, `http` or filesystem capabilities. The formal grammar is [`dsl/grammar/agri.task.v1.bnf`](../dsl/grammar/agri.task.v1.bnf) and the engine design is [`09_DSL_AND_EXECUTION_ENGINE.md`](09_DSL_AND_EXECUTION_ENGINE.md).
 
 ### Grammar concepts
 

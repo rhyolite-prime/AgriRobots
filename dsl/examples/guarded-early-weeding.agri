@@ -1,0 +1,151 @@
+// Grammar conformance example for agri.task/v1.
+// Textual twin of examples/guarded-early-weeding.yaml, extended to exercise the
+// robotics-specific productions: observe/abstain_if, guard, with_permit and
+// degrade_to. Hashes are placeholders, not real model or calibration data.
+//
+// mechanical_weed.v1 is actuation-gated at G7: this task is a bench, simulation
+// and guarded-plot artifact. It is not permission to operate in a crop.
+
+meta {
+  owner "agronomy";
+  change_ticket "AGR-AGRO-031";
+  description "Guarded early-stage weeding pass with abstention on low confidence.";
+}
+
+task guarded-early-weeding@1.0.0 {
+  requires {
+    cassette WD-01 with inspect_plant.v1, mechanical_weed.v1;
+    operator supervisor_on_site;
+    zones plot-a-guarded;
+    map field-survey-2026@1.2.0;
+    route plot-a-guarded commissioned;
+    model weed-detector@2.4.1#1945549f61fe39c28fbf564bc93b45ed248630b4902b721735dcc4a74b0af99b;
+    calibration sha256:22a8f03fdf93fdafd27e41329a0ae9c6ed00cbc22715138068805cda68131133;
+    process_approval AGRO-014;
+  }
+
+  limits {
+    travel_speed     = 0.25 m/s;
+    task_deadline    = 20 min;
+    max_retries      = 0 count;
+    tool_timeout     = 2 s;
+    exclusion_radius = 60 mm;
+    max_force        = 40 N;
+    max_grade        = 5 %;
+  }
+
+  preflight {
+    safety.mode == #READY                       @ within 500 ms;
+    cassette.latch == #LOCKED                   @ within 500 ms;
+    localization.valid == true                  @ within 250 ms;
+    zone.plot_a_guarded.cleared_for_entry == true @ within 5 s;
+    perception.model_version == "weed-detector@2.4.1" @ within 1 s;
+    environment.wind_speed <= 6 m/s             @ within 10 s;
+    operator.present == true                    @ within 2 s;
+  }
+
+  steps {
+    enter_plot: move along plot-a-guarded at 0.25 m/s within 300 s;
+
+    rows: for_each $row in route.plot_a_guarded.rows at_most 40 {
+      look: observe inspect_plant.v1 (
+              row = $row.id,
+              spectrum = #visible_nir,
+              min_confidence = 0.60 ratio
+            )
+            into $plants
+            within 800 ms
+            abstain_if $plants.mean_confidence < 0.92;
+
+      log_scan: record perception.scan_completed {
+        row        = $row.id;
+        plants     = count_of($plants);
+        confidence = $plants.mean_confidence;
+        model      = perception.model_version;
+        abstained  = $plants.abstained;
+      };
+
+      when count_of($plants) > 0 items {
+        // The invariant must hold for the whole actuating block. A breach goes
+        // to on_fault; the guard never widens its own condition.
+        guard localization.valid == true @ within 250 ms every 100 ms {
+          with_permit tool_energy for 30 s {
+            plants_in_row: for_each $plant in $plants.detections at_most 12 {
+              when $plant.kind == #weed && confidence_of($plant) >= 0.92 {
+                strike: actuate mechanical_weed.v1 (
+                          target    = $plant.position,
+                          depth     = 25 mm,
+                          max_force = 40 N
+                        )
+                        within 2 s
+                        verify {
+                          tool.last_action_kind == #mechanical_weed @ within 500 ms;
+                          tool.crop_clearance >= 60 mm              @ within 500 ms;
+                          tool.peak_force <= 40 N                   @ within 500 ms;
+                        }
+                        on_mismatch fault
+                        idempotency_key task.run_id + ":" + $row.id + ":" + $plant.id;
+
+                log_strike: record tool.weed_actuated {
+                  row        = $row.id;
+                  plant      = $plant.id;
+                  clearance  = tool.crop_clearance;
+                  force      = tool.peak_force;
+                  confidence = confidence_of($plant);
+                };
+              }
+
+              when $plant.kind == #crop || confidence_of($plant) < 0.92 {
+                abstain: record perception.abstained_detection {
+                  row        = $row.id;
+                  plant      = $plant.id;
+                  kind       = $plant.kind;
+                  confidence = confidence_of($plant);
+                  reason     = #below_threshold;
+                };
+
+                flag: notify agronomist severity medium "Plant flagged for human review.";
+              }
+            } on_exhausted fault;
+          }
+        } on_breach fault;
+      } otherwise {
+        clear_row: record perception.row_clear { row = $row.id; };
+      };
+
+      when localization.valid == false @ within 250 ms {
+        back_off: degrade_to sensing_only reason = "localization integrity lost";
+      };
+    } on_exhausted fault;
+
+    leave_plot: return_to tool-service-bay within 300 s;
+
+    close_pass: record task.completed {
+      rows      = count_of(route.plot_a_guarded.rows);
+      actuated  = count_of(task.weed_actuations);
+      abstained = count_of(task.abstentions);
+    };
+
+    done: finish success message = "Guarded weeding pass complete";
+  }
+
+  on_fault {
+    halt: safe_stop reason = task.fault_reason;
+    park: park_tool;
+    tell: notify supervisor severity critical "Weeding pass faulted; tool must be inspected.";
+    log:  record task.faulted {
+      reason     = task.fault_reason;
+      node       = task.fault_node;
+      clearance  = tool.crop_clearance;
+      model      = perception.model_version;
+    };
+    stop: finish failed TASK_FAULT message = task.fault_reason;
+  }
+
+  evidence {
+    retain recipe_hash, cassette_manifest, perception_records, tool_trace, safety_events,
+           model_refs, calibration_refs, operator_actions, journal;
+    privacy site_only;
+    retention_days 730;
+  }
+}

@@ -37,7 +37,7 @@ The white paper and the current design package use different maturity levels and
 | Nuxt.js 4.x Virtual Lab | New `apps/virtual-lab` application | Build the minimum useful assembly/manifest/recipe workflow before a broad CAD or circuit suite. |
 | Three.js/WebGPU and GLTF/URDF | Three.js/TresJS with WebGL fallback; URDF/Xacro and GLTF asset ingestion | WebGPU is an optimization, not a browser compatibility requirement. |
 | Omniverse / Isaac Sim / Gazebo WASM | Gazebo Harmonic first; Isaac Sim only when a measured vision-domain-gap benefit justifies it | Simulation must reproduce routes, docking, faults, and replay before photorealistic generation. |
-| AgriDSL / `.ags` and Sapo-style language | Existing `agri.script/v1` YAML → typed IR → bounded executor | Do not create a second grammar. Add adapters/export formats only after the internal semantics are stable. |
+| AgriDSL / `.ags` and Sapo-style language | `agri.task/v1` BNF ([`dsl/grammar/agri.task.v1.bnf`](../dsl/grammar/agri.task.v1.bnf)) + `agri.script/v1` YAML → one canonical `agri.bt-ir/v0` → `agri-engine`, a sibling of [`SapoEngine`](https://github.com/rhyolite-prime/SapoEngine) | One grammar, three serialisations, one IR. The engine reuses the Sapo architecture but ships as a separate library with no script/HTTP/filesystem capability. See [`09_DSL_AND_EXECUTION_ENGINE.md`](09_DSL_AND_EXECUTION_ENGINE.md). |
 | Drogon/C++23 edge runtime | ROS 2 Jazzy integration plus deterministic module controllers and an independent safety controller | C++ may implement the edge executor, but it never replaces the hardwired/safety-rated stop path. |
 | 24 V / 30 A white-paper UTC example | AP-01 UCI-01 contract: 48 V auxiliary feed, protected 24 V, data, safety discrete, and optional fluid lines | Final voltage/current/connector selection is a CDR output based on thermal, isolation, and safety tests. |
 | Twenty-robot swarm | One robot, then two-robot supervised coordination | Fleet behavior is enabled only after the single-robot pilot and signed-update rollback tests pass. |
@@ -149,6 +149,7 @@ The repository boundaries above are scaffolded and enforced in CI by
 | `packages/domain-model` | implemented | Identifier vocabulary and fail-closed `agri.module/v1` validation |
 | `packages/compiler-core` | partial | Strict YAML load (duplicate and merge keys rejected) and `agri.script/v1` validation; `compileToIr()` raises `NotImplementedError` |
 | `packages/policy` | partial | Draft allow-list with hazard class, minimum gate and approval checks |
+| `dsl/grammar` | implemented | `agri.task/v1` BNF, conformance examples and `npm run check:grammar` |
 | `apps/virtual-lab`, `packages/asset-import`, `ros_ws`, `simulation`, `ai`, `fleet`, `recipes`, `test_evidence` | placeholder | README records scope, entry criteria and boundaries; no implementation yet |
 
 Deliberate choices at bootstrap: one strict YAML loader shared by recipes and

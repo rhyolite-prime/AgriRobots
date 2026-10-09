@@ -19,6 +19,8 @@ The carrier deliberately has a fixed protected mobility/safety/compute stack. Ea
 | [Mechanical design](docs/01_MECHANICAL_DESIGN.md) | Carrier, universal cassette interface, mass/CG budget, task modules, fabrication notes |
 | [Controls, ROS 2, and Sapo-style DSL](docs/02_CONTROLS_SOFTWARE_AND_DSL.md) | ROS 2 architecture, independent safety boundary, module API, simulation, task DSL and examples |
 | [AgriScript DSL artifacts](dsl/README.md) | Draft JSON Schema plus feed, egg, sanitation, and conservative-weeding recipe examples |
+| [AgriScript grammar](dsl/grammar/README.md) | Formal `agri.task/v1` BNF, safety properties enforced by syntax, and grammar ↔ YAML ↔ engine mapping |
+| [DSL and execution engine design](docs/09_DSL_AND_EXECUTION_ENGINE.md) | Engine derived from the grammar: parser, validator, IR, interpreter, safety gate, checkpoints, `agric` CLI, conformance plan |
 | [Execution plan and verification](docs/03_EXECUTION_PLAN_AND_VV.md) | 52-week staged plan, gates, pilot acceptance tests, risk register |
 | [Implementation plan](docs/08_IMPLEMENTATION_PLAN.md) | White-paper-to-build roadmap for the Virtual Lab, simulation/AI, AgriScript, edge runtime, hardware, and fleet workstreams |
 | [Preliminary BOM and make/buy plan](docs/04_PRELIMINARY_BOM.md) | Costed work packages and procurement-critical items |
@@ -78,7 +80,7 @@ The baseline supports poultry and **small-livestock** feeding. High-throughput c
 
 - **One core, task cassettes:** AP-01 owns traction, braking, safety sensors, charging, localization, data logging, and a 900 × 580 mm cassette bay. Modules only declare capabilities and cannot bypass the safety controller.
 - **ROS 2 remains the integration fabric—not the safety controller:** ROS 2 Jazzy on Ubuntu 24.04 runs mission, perception, navigation, and module behavior. A separate safety PLC/MCU watches E-stops, safety lidar, bumpers, tilt, heartbeat, and contactors.
-- **Sapo-style declarative recipes:** A small typed YAML DSL compiles to an allow-listed behavior tree. Recipes are schema-checked, capability-checked, signed, bounded by zones/speed/chemical policy, and auditable. It is *inspired by* the requested Sapo-style approach; it does not claim compatibility with any external Sapo implementation.
+- **A DSL and engine in the Sapo lineage:** [Sapo Engine](https://github.com/rhyolite-prime/SapoEngine) replaced hand-written USSD `if/else` session managers with validated blueprints; `agri-engine` applies the same discipline to a physical machine. A formal [BNF grammar](dsl/grammar/agri.task.v1.bnf) makes deadlines, verification clauses, loop bounds, permits and guards syntactically mandatory, and has no production for scripting, network, filesystem or raw actuator access. Recipes are schema-checked, capability-checked, signed, bounded by zone/speed/chemical policy, and auditable.
 - **Conservative vision for seedlings:** The weeding module only actuates when crop/weed/position confidence, latency, and safety envelope tests all pass. Uncertain plants are logged for human review—not removed.
 - **Simulation before field action:** CAD/URDF + Gazebo/Harmonic (or Isaac Sim for photorealistic vision) provides the digital twin, fault scenarios, replay, and hardware-in-the-loop pathway. The Microduck inspiration is its open simulation-to-real workflow, not its bipedal geometry.
 

@@ -1,0 +1,418 @@
+;; ===========================================================================
+;; AgriScript task grammar — agri.task/v1
+;; ===========================================================================
+;;
+;; Purpose
+;;   Formal grammar for the task language executed by the AgriBots engine
+;;   (`agri-engine`, the robotics sibling of the Sapo DSL execution engine).
+;;   The grammar is the authority on what a task may say. Anything a validator
+;;   or the interpreter refuses must be refused here first: if a construct
+;;   cannot be derived from <task>, it cannot be compiled, signed or executed.
+;;
+;; Design lineage (github.com/rhyolite-prime/SapoEngine)
+;;   Reused ideas: node/statement graph with explicit ids and jumps, expressions
+;;   compiled once at parse time, capability calls by dotted name resolved
+;;   against a registry (unknown capability = parse-time refusal), durable
+;;   suspension instead of parked threads, mandatory error handling, static
+;;   graph validation before execution, deterministic CLI compile/validate/run.
+;;   Changed for physical machines: mandatory deadlines and post-condition
+;;   verification on every actuation, syntactically bounded loops, an explicit
+;;   safety-permit request production, continuous invariant guards, unit-bearing
+;;   quantities, staleness bounds on state reads, no general assignment, and no
+;;   production of any kind for shell, file, network or raw motor access.
+;;
+;; Meta-notation
+;;   <name>          nonterminal
+;;   "text"          terminal (literal keyword or punctuation)
+;;   [ x ]           optional (zero or one)
+;;   { x }           zero or more repetitions
+;;   { x }+          one or more repetitions
+;;   ( a | b )       alternation
+;;   ;;              comment to end of line
+;;   Productions are listed in the order the parser expects them; clause order
+;;   inside <task-body> is fixed so that two tasks diff clause by clause.
+;;
+;; Semantic rules (checked after parsing, never by rewriting the grammar)
+;;   S1  Every capability id in an <actuate-stmt> or <observe-stmt> must resolve
+;;       in the installed capability registry and be listed in the cassette
+;;       manifest; unknown capability = compile-time error.
+;;   S2  Every <actuate-stmt> carries a deadline and a verify clause; the
+;;       post-conditions must be observable state, not internal variables.
+;;   S3  Loops are bounded by syntax (`at_most`, `repeat N times`); a loop whose
+;;       bound exceeds the policy limit is rejected at compile time.
+;;   S4  An <actuate-stmt> whose capability hazard class is `conditional_task`
+;;       or `actuation_gated` must be lexically enclosed by a granted
+;;       <permit-stmt> block or a <guard-block> with an approved permit.
+;;   S5  State references used in <preflight-clause>, <guard-block> conditions
+;;       and any safety-relevant <when> condition must carry a freshness bound
+;;       (`@ within <duration>`); a stale read is inhibiting, never permissive.
+;;   S6  Every <stmt-id> is unique in the task; every jump target exists; every
+;;       statement is reachable; the fault clause is reachable from every
+;;       actuating statement.
+;;   S7  A task has no production that grants permission, clears a stop, changes
+;;       a safety mode, raises a limit or writes to `safety.*` / `carrier.*`.
+;;       Those are safety-controller decisions and are not expressible here.
+;;   S8  Subtask depth and total statement count are bounded by policy.
+;;   S9  Units must be dimensionally consistent; a quantity may not be compared
+;;       or assigned across incompatible dimensions.
+;;   S10 Determinism: no wall-clock read, no random, no unbounded recursion.
+;;       Time comes from the injected engine clock; retry is explicit and
+;;       bounded and requires an idempotency key on physical actions.
+;;
+;; ===========================================================================
+;; 1. Document structure
+;; ===========================================================================
+
+<program>           ::= { <whitespace> | <comment> } <task> { <whitespace> | <comment> }
+
+<task>              ::= [ <meta-clause> ] "task" <task-name> "@" <version> <task-body>
+
+<task-body>         ::= "{" <requires-clause>
+                            <limits-clause>
+                            <preflight-clause>
+                            <steps-clause>
+                            <fault-clause>
+                            <evidence-clause>
+                        "}"
+
+<meta-clause>       ::= "meta" "{" <meta-entry>+ "}"
+<meta-entry>        ::= ( "owner" <string-literal>
+                        | "change_ticket" <string-literal>
+                        | "description" <string-literal>
+                        | "tags" <string-list> ) ";"
+
+<requires-clause>   ::= "requires" "{"
+                            "cassette" <cassette-id> "with" <capability-list> ";"
+                            "operator" <operator-policy> ";"
+                            "zones" <zone-list> ";"
+                          [ "map" <map-revision> ";" ]
+                          [ "route" <route-ref> "commissioned" ";" ]
+                          [ "model" <model-ref> ";" ]
+                          [ "calibration" <calibration-ref> ";" ]
+                          [ "process_approval" <approval-ref> ";" ]
+                        "}"
+
+<capability-list>   ::= <capability-id> { "," <capability-id> }
+<operator-policy>   ::= "supervisor_on_site" | "two_person_rule"
+                      | "remote_observer" | "unattended_forbidden"
+<zone-list>         ::= <zone-id> { "," <zone-id> }
+<string-list>       ::= <string-literal> { "," <string-literal> }
+
+<limits-clause>     ::= "limits" "{" <limit-entry>+ "}"
+<limit-entry>       ::= <limit-key> "=" <quantity> ";"
+<limit-key>         ::= "travel_speed" | "task_deadline" | "max_retries"
+                      | "tool_timeout" | "dock_tolerance" | "max_grade"
+                      | "max_mass" | "energy_budget" | "exclusion_radius"
+                      | "max_force" | "max_pressure" | "max_volume_rate"
+
+<preflight-clause>  ::= "preflight" "{" <assertion>+ "}"
+<assertion>         ::= <condition> [ <freshness> ] ";"
+
+<steps-clause>      ::= "steps" "{" <statement-list> "}"
+<fault-clause>      ::= "on_fault" "{" <statement-list> "}"
+<evidence-clause>   ::= "evidence" "{"
+                            "retain" <retain-list> ";"
+                          [ "privacy" <privacy-class> ";" ]
+                          [ "retention_days" <integer> ";" ]
+                        "}"
+
+<retain-list>       ::= <retain-item> { "," <retain-item> }
+<retain-item>       ::= "recipe_hash" | "cassette_manifest" | "route_events"
+                      | "safety_events" | "scale_trace" | "dose_trace"
+                      | "tool_trace" | "perception_records" | "operator_actions"
+                      | "calibration_refs" | "model_refs" | "journal"
+<privacy-class>     ::= "no_personal_data" | "site_only" | "worker_consent"
+                      | "animal_records" | "restricted"
+
+;; ===========================================================================
+;; 2. Statements
+;; ===========================================================================
+
+<statement-list>    ::= { <statement> }
+<block>             ::= "{" <statement-list> "}"
+<statement>         ::= [ <stmt-id> ":" ] <statement-body> ";"
+<statement-body>    ::= <motion-stmt>
+                      | <actuate-stmt>
+                      | <observe-stmt>
+                      | <await-stmt>
+                      | <permit-stmt>
+                      | <guard-block>
+                      | <control-stmt>
+                      | <record-stmt>
+                      | <safety-stmt>
+                      | <subtask-stmt>
+                      | <terminate-stmt>
+                      | <noop-stmt>
+
+;; --- 2.1 Motion (carrier movement; bounded by zone and cassette limits) ----
+
+<motion-stmt>       ::= "move" "along" <route-ref> [ "at" <speed-value> ] "within" <duration>
+                      | "dock" "at" <station-ref> [ "tolerance" <length-value> ] "within" <duration>
+                      | "return_to" <place-ref> "within" <duration>
+
+;; --- 2.2 Actuation (the only productions that may energise a tool) ---------
+;; A deadline and a verify clause are syntactically mandatory. `verify`
+;; post-conditions are observable state, so a completed action must be proven
+;; by the world, not by the action's own return value.
+
+<actuate-stmt>      ::= "actuate" <capability-id> <arg-list>
+                        "within" <duration>
+                        "verify" "{" <postcondition>+ "}"
+                        [ "on_mismatch" ( "fault" | "retry" <retry-spec> ) ]
+                        [ "idempotency_key" <expr> ]
+
+<arg-list>          ::= "(" [ <arg> { "," <arg> } ] ")"
+<arg>               ::= <arg-name> "=" <expr>
+<arg-name>          ::= <identifier>
+<postcondition>     ::= <condition> [ <freshness> ] ";"
+<retry-spec>        ::= "at_most" <integer> "times" [ "backoff" <duration> ]
+                        "idempotency_key" <expr>
+
+;; --- 2.3 Observation (sensing only; may never command an actuator) --------
+
+<observe-stmt>      ::= "observe" <capability-id> <arg-list>
+                        "into" <variable>
+                        [ "within" <duration> ]
+                        [ "abstain_if" <condition> ]
+
+;; --- 2.4 Suspension (durable wait; never a parked thread) -----------------
+
+<await-stmt>        ::= "await" <await-target> "within" <duration>
+                        [ "on_timeout" ( "fault" | <stmt-id> ) ]
+<await-target>      ::= "event" <event-name>
+                      | "completion_of" <stmt-id>
+                      | "operator" <prompt-spec>
+                      | <condition> [ <freshness> ]
+<prompt-spec>       ::= <string-literal> [ "reply" <variable> ]
+                        [ "choice_of" <string-list> ]
+
+;; --- 2.5 Safety permission (request only; granting is not expressible) ----
+
+<permit-stmt>       ::= "with_permit" <permit-kind> [ "for" <duration> ] <block>
+                      | "request_permit" <permit-kind> [ "for" <duration> ]
+                        [ "on_denied" ( "fault" | <stmt-id> ) ]
+<permit-kind>       ::= "tool_energy" | "auto_task" | "auto_travel"
+                      | "service" | "fluid_line" | "guarded_plot_entry"
+
+;; --- 2.6 Continuous invariant (must hold throughout the block) ------------
+
+<guard-block>       ::= "guard" <condition> <freshness> [ "every" <duration> ]
+                        <block>
+                        [ "on_breach" ( "fault" | <stmt-id> ) ]
+
+;; --- 2.7 Control flow ----------------------------------------------------
+
+<control-stmt>      ::= <for-each-stmt>
+                      | <repeat-stmt>
+                      | <when-stmt>
+                      | <parallel-stmt>
+                      | <sequence-stmt>
+
+<for-each-stmt>     ::= "for_each" <variable> "in" <expr> "at_most" <integer> <block>
+                        [ "on_exhausted" ( "fault" | <stmt-id> ) ]
+<repeat-stmt>       ::= "repeat" <integer> "times" <block>
+<when-stmt>         ::= "when" <condition> [ <freshness> ] <block>
+                        [ "otherwise" <block> ]
+<parallel-stmt>     ::= "parallel" "{" <branch>+ "}" "join" <join-policy>
+<branch>            ::= [ <stmt-id> ":" ] "branch" <resource-class> <block>
+<join-policy>       ::= "all" | "first_success" | "quorum" "(" <integer> ")"
+<resource-class>    ::= "sensing" | "logging" | "communication" | "tool"
+                      | "traction" | "fluid"
+<sequence-stmt>     ::= "sequence" <block>
+
+;; --- 2.8 Evidence, notification and task-level safety --------------------
+
+<record-stmt>       ::= "record" <event-name> "{" <field-list> "}"
+<field-list>        ::= <field-entry> { ";" <field-entry> } [ ";" ]
+<field-entry>       ::= <identifier> "=" <expr>
+
+<safety-stmt>       ::= "safe_stop" [ "reason" "=" <expr> ]
+                      | "park_tool"
+                      | "degrade_to" <degraded-mode> [ "reason" "=" <expr> ]
+                      | "notify" <role> "severity" <severity> [ <string-literal> ]
+<degraded-mode>     ::= "sensing_only" | "shadow" | "reduced_speed"
+                      | "hold_position" | "return_to_dock"
+<severity>          ::= "low" | "medium" | "high" | "critical"
+<role>              ::= "stockperson" | "operator" | "supervisor" | "agronomist"
+                      | "process_owner" | "maintenance" | "safety_officer"
+                      | "fleet_service"
+
+;; --- 2.9 Composition and termination -------------------------------------
+
+<subtask-stmt>      ::= "run_task" <task-name> "@" <version>
+                        [ "with" <arg-list> ]
+                        "depth_at_most" <integer>
+<terminate-stmt>    ::= "finish" ( "success" | "failed" <error-code> | "aborted" )
+                        [ "message" "=" <expr> ]
+<noop-stmt>         ::= "noop" [ <string-literal> ]
+
+;; ===========================================================================
+;; 3. Expressions — agri.expr/v1
+;; ===========================================================================
+;; Expressions are compiled once at parse time into immutable programs (as in
+;; Sapo's SEL). They may read state and locals, compute, and compare. They have
+;; no side effects, no assignment, no I/O and no function calls other than the
+;; built-ins listed here.
+
+<expr>              ::= <or-expr>
+<or-expr>           ::= <and-expr> { "||" <and-expr> }
+<and-expr>          ::= <not-expr> { "&&" <not-expr> }
+<not-expr>          ::= [ "!" ] <comparison>
+<comparison>        ::= <additive> [ <compare-op> <additive> ]
+<compare-op>        ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+<additive>          ::= <multiplicative> { ( "+" | "-" ) <multiplicative> }
+<multiplicative>    ::= <unary> { ( "*" | "/" ) <unary> }
+<unary>             ::= [ "-" ] <postfix>
+<postfix>           ::= <primary> { ( "." <identifier> | "[" <expr> "]" ) }
+
+<primary>           ::= <quantity>
+                      | <duration>
+                      | <string-literal>
+                      | <boolean>
+                      | "null"
+                      | <enum-literal>
+                      | <state-ref>
+                      | <variable>
+                      | <builtin-call>
+                      | <list-literal>
+                      | <struct-literal>
+                      | "(" <expr> ")"
+
+<condition>         ::= <expr>
+
+<list-literal>      ::= "[" [ <expr> { "," <expr> } ] "]"
+<struct-literal>    ::= "{" [ <struct-field> { "," <struct-field> } ] "}"
+<struct-field>      ::= <identifier> "=" <expr>
+
+<builtin-call>      ::= <builtin-name> "(" [ <expr> { "," <expr> } ] ")"
+<builtin-name>      ::= "abs" | "min" | "max" | "clamp" | "len" | "sum"
+                      | "age_of" | "quality_of" | "confidence_of" | "unit_of"
+                      | "coalesce" | "in_zone" | "within_tolerance"
+                      | "is_fresh" | "count_of"
+
+;; --- 3.1 State references -------------------------------------------------
+;; Roots are fixed by the grammar so that the set of readable state is a
+;; reviewable, closed list. `safety` is read-only and `carrier` exposes no
+;; writable path; there is no assignment production anywhere in this grammar.
+
+<state-ref>         ::= <state-root> { "." <identifier> } [ <freshness> ]
+<state-root>        ::= "carrier" | "cassette" | "tool" | "battery" | "safety"
+                      | "localization" | "perception" | "route" | "zone"
+                      | "inventory" | "operator" | "task" | "environment"
+<freshness>         ::= "@" "within" <duration>
+
+<variable>          ::= "$" <identifier>
+
+;; --- 3.2 Quantities, units and literals -----------------------------------
+
+<quantity>          ::= <number> <unit>
+<unit>              ::= <length-unit> | <mass-unit> | <volume-unit>
+                      | <time-unit> | <speed-unit> | <angle-unit>
+                      | <ratio-unit> | <electrical-unit> | <force-unit>
+                      | <pressure-unit> | <temperature-unit>
+                      | <concentration-unit> | <count-unit>
+<length-unit>       ::= "mm" | "cm" | "m" | "km"
+<mass-unit>         ::= "g" | "kg" | "t"
+<volume-unit>       ::= "mL" | "L" | "m3"
+<time-unit>         ::= "ms" | "s" | "min" | "h"
+<speed-unit>        ::= "m/s" | "mm/s" | "km/h" | "rad/s"
+<angle-unit>        ::= "deg" | "rad"
+<ratio-unit>        ::= "%" | "ppm" | "ratio"
+<electrical-unit>   ::= "V" | "A" | "W" | "Wh"
+<force-unit>        ::= "N" | "kN" | "Nm"
+<pressure-unit>     ::= "Pa" | "kPa" | "bar"
+<temperature-unit>  ::= "degC" | "K"
+<concentration-unit>::= "g/L" | "mg/L" | "mol/L"
+<count-unit>        ::= "count" | "items" | "eggs" | "stations" | "plants"
+
+<duration>          ::= <number> ( "ms" | "s" | "min" | "h" )
+<speed-value>       ::= <number> <speed-unit>
+<length-value>      ::= <number> <length-unit>
+
+<number>            ::= [ "-" ] <digit>+ [ "." <digit>+ ] [ <exponent> ]
+<exponent>          ::= ( "e" | "E" ) [ "+" | "-" ] <digit>+
+<integer>           ::= <digit>+
+<boolean>           ::= "true" | "false"
+<enum-literal>      ::= "#" <identifier>
+<error-code>        ::= <upper-identifier>
+<event-name>        ::= <lower-identifier> { "." <lower-identifier> }
+
+<string-literal>    ::= '"' { <any-char> - ('"' | "\\") | "\\" <escape-char> } '"'
+<escape-char>       ::= '"' | "\\" | "n" | "t" | "r"
+
+;; ===========================================================================
+;; 4. Identifiers and references
+;; ===========================================================================
+
+<task-name>         ::= <lower-identifier> { "-" <lower-alnum> }   ;; 3..63 chars
+<stmt-id>           ::= <identifier>
+<identifier>        ::= <letter> { <letter> | <digit> | "_" }
+<lower-identifier>  ::= <lower-letter> { <lower-letter> | <digit> | "_" }
+<upper-identifier>  ::= <upper-letter> { <upper-letter> | <digit> | "_" }
+<lower-alnum>       ::= <lower-letter> | <digit>
+<version>           ::= <digit>+ "." <digit>+ "." <digit>+
+
+<capability-id>     ::= <identifier> "." "v" <digit>+
+<cassette-id>       ::= "EG-01" | "FD-01" | "CS-01" | "WD-01"
+<zone-id>           ::= <lower-alnum> { <lower-alnum> | "-" }      ;; 2..63 chars
+<route-ref>         ::= <zone-id>
+<station-ref>       ::= <zone-id>
+<place-ref>         ::= <zone-id>
+<map-revision>      ::= <identifier> "@" <version>
+<model-ref>         ::= <identifier> "@" <version> [ "#" <sha256-hex> ]
+<calibration-ref>   ::= "sha256:" <sha256-hex>
+<approval-ref>      ::= <upper-identifier> "-" <digit>+
+<sha256-hex>        ::= { <hex-digit> }                            ;; exactly 64
+
+<letter>            ::= <lower-letter> | <upper-letter>
+<lower-letter>      ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+                      | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r"
+                      | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<upper-letter>      ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I"
+                      | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R"
+                      | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<digit>             ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<hex-digit>         ::= <digit> | "a" | "b" | "c" | "d" | "e" | "f"
+
+;; ===========================================================================
+;; 5. Lexical rules
+;; ===========================================================================
+
+<any-char>          ::= <letter> | <digit> | <symbol> | <whitespace>
+<symbol>            ::= "!" | "#" | "$" | "%" | "&" | "'" | "(" | ")" | "*"
+                      | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "="
+                      | ">" | "?" | "@" | "[" | "\\" | "]" | "^" | "_" | "`"
+                      | "{" | "|" | "}" | "~"
+
+<whitespace>        ::= " " | "\t" | "\r" | "\n"
+<comment>           ::= "//" { <any-char> - <newline> }
+                      | "/*" { <any-char> } "*/"
+<newline>           ::= "\n"
+
+;; The lexical analyser skips <whitespace> and <comment> between tokens.
+;; Keywords are case-sensitive and lowercase except <error-code>, units and
+;; <cassette-id>. Units are matched longest-first so that "m/s" is not lexed as
+;; "m" followed by "/s", and "mL" is not lexed as "m" followed by "L".
+
+;; ===========================================================================
+;; 6. Reserved and deliberately absent
+;; ===========================================================================
+;;
+;; Reserved for later versions; using them is a compile-time error in v1:
+;;   "swarm" "handover" "follow" "convoy" "learned_policy" "policy_network"
+;;   "remote_command" "teleoperate"
+;;
+;; The following have no production and must never be added to this grammar,
+;; because their absence is a safety property and not an omission:
+;;   shell/exec/eval/system/script    — no arbitrary code execution
+;;   http/get/post/socket/mqtt        — no network access from a task
+;;   read_file/write_file/import      — no filesystem access from a task
+;;   pwm/motor/torque/current/velocity_cmd — no raw actuator command
+;;   grant/clear/override/reset_estop/disable_guard/widen_field/raise_limit
+;;                                      — no authority over the safety controller
+;;   random/now/today                 — no nondeterminism or wall-clock reads
+;;   assignment ("=" at statement level) — state is bound by observation only
+;;
+;; ===========================================================================
+;; End of grammar agri.task/v1
+;; ===========================================================================
