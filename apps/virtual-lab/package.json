@@ -1,0 +1,31 @@
+{
+  "name": "@agrirobots/virtual-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nuxt 4 Virtual Lab: compile an agri.task/v1 script, execute it against the ARACNID kinematic twin and replay the journal, safety functions and twin frames.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "node .output/server/index.mjs",
+    "prepare": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@agrirobots/compiler-core": "*",
+    "@agrirobots/contracts": "*",
+    "@agrirobots/domain-model": "*",
+    "@agrirobots/engine": "*",
+    "@agrirobots/policy": "*",
+    "nuxt": "^4.6.0",
+    "three": "^0.186.1",
+    "vue": "^3.5.43"
+  },
+  "devDependencies": {
+    "@types/three": "^0.186.0",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.1.4"
+  }
+}
