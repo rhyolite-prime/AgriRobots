@@ -1,0 +1,20 @@
+{
+  "name": "@agrirobots/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "agri.task/v1 execution engine: virtual clock, state resolver with freshness, independent safety model, resource arbitration, permit leases, statement interpreter and deterministic mission runner.",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@agrirobots/compiler-core": "*",
+    "@agrirobots/contracts": "*",
+    "@agrirobots/domain-model": "*",
+    "@agrirobots/policy": "*"
+  }
+}

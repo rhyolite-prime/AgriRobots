@@ -65,7 +65,8 @@ export interface IrTarget {
 
 export type IrFaultOrId = { kind: 'fault' } | { kind: 'goto'; target: string };
 
-export type IrJoin = { kind: 'all' } | { kind: 'first_success' } | { kind: 'quorum'; count: number };
+export type IrJoin =
+  { kind: 'all' } | { kind: 'first_success' } | { kind: 'quorum'; count: number };
 
 export interface IrBranch {
   id?: string;
@@ -85,7 +86,14 @@ export interface IrAwaitTarget {
 
 /** One compiled statement: a stable id, no source spans, nothing optional left implicit. */
 export type IrStmt =
-  | { id: string; label?: string; kind: 'move'; route: IrTarget; speed?: IrQuantity; within: IrDuration }
+  | {
+      id: string;
+      label?: string;
+      kind: 'move';
+      route: IrTarget;
+      speed?: IrQuantity;
+      within: IrDuration;
+    }
   | {
       id: string;
       label?: string;
