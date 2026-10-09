@@ -67,7 +67,7 @@ task aracnid-egg-collection@1.0.0 {
       note_abstain: notify supervisor severity medium
         "nest scan abstained; round ends without picking";
       finish aborted message = "low-confidence nest scan";
-    }
+    };
 
     // Picks run concurrently, one exclusive hand instance per branch (S11).
     // Traction is not claimed anywhere in this block: EG-08 declares
@@ -85,7 +85,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h2: branch tool[hand_2] {
           with_permit tool_energy on tool[hand_2] for 30 s {
             actuate pick_egg.v1 (hand = #hand_2, slot = $nest.slot_2)
@@ -97,7 +97,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h3: branch tool[hand_3] {
           with_permit tool_energy on tool[hand_3] for 30 s {
             actuate pick_egg.v1 (hand = #hand_3, slot = $nest.slot_3)
@@ -109,7 +109,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h4: branch tool[hand_4] {
           with_permit tool_energy on tool[hand_4] for 30 s {
             actuate pick_egg.v1 (hand = #hand_4, slot = $nest.slot_4)
@@ -121,7 +121,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h5: branch tool[hand_5] {
           with_permit tool_energy on tool[hand_5] for 30 s {
             actuate pick_egg.v1 (hand = #hand_5, slot = $nest.slot_5)
@@ -133,7 +133,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h6: branch tool[hand_6] {
           with_permit tool_energy on tool[hand_6] for 30 s {
             actuate pick_egg.v1 (hand = #hand_6, slot = $nest.slot_6)
@@ -145,7 +145,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h7: branch tool[hand_7] {
           with_permit tool_energy on tool[hand_7] for 30 s {
             actuate pick_egg.v1 (hand = #hand_7, slot = $nest.slot_7)
@@ -157,7 +157,7 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
         h8: branch tool[hand_8] {
           with_permit tool_energy on tool[hand_8] for 30 s {
             actuate pick_egg.v1 (hand = #hand_8, slot = $nest.slot_8)
@@ -169,28 +169,32 @@ task aracnid-egg-collection@1.0.0 {
               }
               on_mismatch fault;
           }
-        }
+        ;}
       } join quorum(6);
     } on_breach fault;
 
     // Placement is serialised: each transfer claims its hand and the magazine
     // together, so the tray never indexes under a second hand (SF-AR-10).
     place: for_each $held in tool.holding_hands @ within 1 s at_most 8 {
-      actuate place_egg.v1 (hand = $held, tray = #next_saleable)
-        using tool[magazine]
-        within 10 s
-        verify {
-          cassette.magazine.slot_confirmed == true @ within 1 s;
-          tool[$held].load_mass == 0 g @ within 1 s;
-        }
-        on_mismatch retry at_most 1 times backoff 2 s
-          idempotency_key $held.transfer_key;
-    } on_exhausted fault;
+      // The permit names both instances the transfer claims, so the magazine
+      // index motor cannot be enabled while a second hand is inside the tray.
+      with_permit tool_energy on tool[$held.id] + tool[magazine] for 20 s {
+        actuate place_egg.v1 (hand = $held.id, tray = #next_saleable)
+          using tool[$held.id] + tool[magazine]
+          within 10 s
+          verify {
+            cassette.magazine.slot_confirmed == true @ within 1 s;
+            tool[$held.id].load_mass == 0 g @ within 1 s;
+          }
+          on_mismatch retry at_most 1 times backoff 2 s
+            idempotency_key $held.transfer_key;
+      }
+    ;} on_exhausted fault;
 
     tally: record egg_round.completed {
-      picked = count_of($nest.slots_offered),
-      stowed = count_of(tool.holding_hands),
-      abstained = $nest.abstained,
+      picked = count_of($nest.slots_offered);
+      stowed = count_of(tool.holding_hands);
+      abstained = $nest.abstained;
     };
 
     finish success message = "ARACNID round complete; trays indexed and verified";

@@ -12,7 +12,8 @@
     "packages/contracts",
     "packages/domain-model",
     "packages/compiler-core",
-    "packages/policy"
+    "packages/policy",
+    "packages/engine"
   ],
   "scripts": {
     "check:tree": "node scripts/check-tree.mjs",

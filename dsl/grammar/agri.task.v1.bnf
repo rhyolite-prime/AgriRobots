@@ -153,9 +153,14 @@
 
 ;; --- 2.1 Motion (carrier movement; bounded by zone and cassette limits) ----
 
-<motion-stmt>       ::= "move" "along" <route-ref> [ "at" <speed-value> ] "within" <duration>
-                      | "dock" "at" <station-ref> [ "tolerance" <length-value> ] "within" <duration>
-                      | "return_to" <place-ref> "within" <duration>
+;; A motion target is either a commissioned zone/route id or a path into a
+;; variable bound earlier by `for_each` or `observe` (`dock at $stop.id`). The
+;; variable form is resolved at run time and must still name a commissioned
+;; zone: an unknown target is a fault, never an implicit "go anywhere".
+<motion-stmt>       ::= "move" "along" <motion-target> [ "at" <speed-value> ] "within" <duration>
+                      | "dock" "at" <motion-target> [ "tolerance" <length-value> ] "within" <duration>
+                      | "return_to" <motion-target> "within" <duration>
+<motion-target>     ::= <zone-id> | <variable-path>
 
 ;; --- 2.2 Actuation (the only productions that may energise a tool) ---------
 ;; A deadline and a verify clause are syntactically mandatory. `verify`
@@ -163,7 +168,7 @@
 ;; by the world, not by the action's own return value.
 
 <actuate-stmt>      ::= "actuate" <capability-id> <arg-list>
-                        [ "using" <resource-spec> ]
+                        [ "using" <resource-spec-list> ]
                         "within" <duration>
                         "verify" "{" <postcondition>+ "}"
                         [ "on_mismatch" ( "fault" | "retry" <retry-spec> ) ]
@@ -196,9 +201,9 @@
 
 ;; --- 2.5 Safety permission (request only; granting is not expressible) ----
 
-<permit-stmt>       ::= "with_permit" <permit-kind> [ "on" <resource-spec> ]
+<permit-stmt>       ::= "with_permit" <permit-kind> [ "on" <resource-spec-list> ]
                         [ "for" <duration> ] <block>
-                      | "request_permit" <permit-kind> [ "on" <resource-spec> ]
+                      | "request_permit" <permit-kind> [ "on" <resource-spec-list> ]
                         [ "for" <duration> ]
                         [ "on_denied" ( "fault" | <stmt-id> ) ]
 <permit-kind>       ::= "tool_energy" | "auto_task" | "auto_travel"
@@ -218,6 +223,9 @@
                       | <parallel-stmt>
                       | <sequence-stmt>
 
+;; The collection is evaluated once, at entry. `on_exhausted` fires when the
+;; `at_most` bound is consumed and items are still left: bounded work that could
+;; not be finished must never pass silently (S3).
 <for-each-stmt>     ::= "for_each" <variable> "in" <expr> "at_most" <integer> <block>
                         [ "on_exhausted" ( "fault" | <stmt-id> ) ]
 <repeat-stmt>       ::= "repeat" <integer> "times" <block>
@@ -232,7 +240,13 @@
 ;; expressible and statically checkable: `tool[hand_1]` and `tool[hand_2]`
 ;; may run in parallel, two claims of `tool[hand_1]` may not (S11).
 <resource-spec>     ::= <resource-class> [ "[" <resource-instance> "]" ]
-<resource-instance> ::= <identifier> | <variable>
+
+;; A single action may claim several resources at once, and must: placing an
+;; egg claims the hand holding it *and* the magazine that indexes the tray
+;; (SF-AR-10). All claims in one list are taken atomically before dispatch and
+;; released together after verification; a partial grant is a denial.
+<resource-spec-list>::= <resource-spec> { "+" <resource-spec> }
+<resource-instance> ::= <identifier> | <variable-path>
 <resource-class>    ::= "sensing" | "logging" | "communication" | "tool"
                       | "traction" | "fluid"
 <sequence-stmt>     ::= "sequence" <block>
@@ -327,7 +341,7 @@
                       | <time-unit> | <speed-unit> | <angle-unit>
                       | <ratio-unit> | <electrical-unit> | <force-unit>
                       | <pressure-unit> | <temperature-unit>
-                      | <concentration-unit> | <count-unit>
+                      | <concentration-unit> | <count-unit> | <rate-unit>
 <length-unit>       ::= "mm" | "cm" | "m" | "km"
 <mass-unit>         ::= "g" | "kg" | "t"
 <volume-unit>       ::= "mL" | "L" | "m3"
@@ -341,6 +355,8 @@
 <temperature-unit>  ::= "degC" | "K"
 <concentration-unit>::= "g/L" | "mg/L" | "mol/L"
 <count-unit>        ::= "count" | "items" | "eggs" | "stations" | "plants"
+<rate-unit>         ::= "kg/s" | "g/s" | "kg/min" | "L/s" | "mL/s" | "L/min"
+                      | "mL/min"
 
 <duration>          ::= <number> ( "ms" | "s" | "min" | "h" )
 <speed-value>       ::= <number> <speed-unit>
@@ -373,11 +389,10 @@
 <cassette-id>       ::= "EG-01" | "EG-08" | "FD-01" | "CS-01" | "WD-01"
 <zone-id>           ::= <lower-alnum> { <lower-alnum> | "-" }      ;; 2..63 chars
 <route-ref>         ::= <zone-id>
-<station-ref>       ::= <zone-id>
-<place-ref>         ::= <zone-id>
+<variable-path>     ::= <variable> { "." <identifier> | "[" <expr> "]" }
+<calibration-ref>   ::= "sha256:" <sha256-hex>   ;; lexed as one token
 <map-revision>      ::= <identifier> "@" <version>
 <model-ref>         ::= <identifier> "@" <version> [ "#" <sha256-hex> ]
-<calibration-ref>   ::= "sha256:" <sha256-hex>
 <approval-ref>      ::= <upper-identifier> "-" <digit>+
 <sha256-hex>        ::= { <hex-digit> }                            ;; exactly 64
 

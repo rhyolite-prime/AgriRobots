@@ -5,6 +5,7 @@ export const POLICY_ERROR_CODES = {
   capabilityDenied: 'E_POLICY_CAPABILITY_DENIED',
   gateNotReached: 'E_POLICY_GATE_NOT_REACHED',
   approvalMissing: 'E_POLICY_APPROVAL_MISSING',
+  taskSourceUnreadable: 'E_POLICY_TASK_SOURCE_UNREADABLE',
 } as const;
 
 export type PolicyErrorCode = (typeof POLICY_ERROR_CODES)[keyof typeof POLICY_ERROR_CODES];

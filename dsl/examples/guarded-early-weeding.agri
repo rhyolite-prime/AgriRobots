@@ -95,7 +95,7 @@ task guarded-early-weeding@1.0.0 {
                 };
               }
 
-              when $plant.kind == #crop || confidence_of($plant) < 0.92 {
+              ;when $plant.kind == #crop || confidence_of($plant) < 0.92 {
                 abstain: record perception.abstained_detection {
                   row        = $row.id;
                   plant      = $plant.id;
@@ -106,9 +106,9 @@ task guarded-early-weeding@1.0.0 {
 
                 flag: notify agronomist severity medium "Plant flagged for human review.";
               }
-            } on_exhausted fault;
+            ;} on_exhausted fault;
           }
-        } on_breach fault;
+        ;} on_breach fault;
       } otherwise {
         clear_row: record perception.row_clear { row = $row.id; };
       };

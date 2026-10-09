@@ -47,20 +47,27 @@ task poultry-evening-feed@1.0.0 {
     feed_stops: for_each $stop in route.house_3_feed_lane.stops at_most 24 {
       at_station: dock at $stop.id tolerance 40 mm within 45 s;
 
-      dispense: actuate dispense_mass.v1 (
-                  station = $stop.id,
-                  mass    = $stop.mass,
-                  rate    = 0.30 kg/s
-                )
-                within 90 s
-                verify {
-                  tool.dispensed_mass == $stop.mass @ within 2 s;
-                  tool.scale_traceable == true      @ within 2 s;
-                  tool.hopper_level >= 5 kg         @ within 2 s;
-                }
-                on_mismatch retry at_most 1 times backoff 3 s
-                            idempotency_key task.run_id + ":" + $stop.id
-                idempotency_key task.run_id + ":" + $stop.id;
+      // Dosing is a conditional_task capability (S4): it may only run inside a
+      // granted tool-energy permit that names the dispensing resource.
+      dispense: with_permit tool_energy on tool[dispenser] for 120 s {
+        pour: actuate dispense_mass.v1 (
+                station = $stop.id,
+                mass    = $stop.mass,
+                rate    = 0.30 kg/s
+              )
+              within 90 s
+              verify {
+                // Post-conditions read the world, never the script's own copy of
+                // the plan (S2): the auger proves its dose against the set point
+                // it was commanded with, and the scale proves traceability.
+                tool.dose_agreement == true  @ within 2 s;
+                tool.scale_traceable == true @ within 2 s;
+                tool.hopper_level >= 5 kg    @ within 2 s;
+              }
+              on_mismatch retry at_most 1 times backoff 3 s
+                          idempotency_key task.run_id + ":" + $stop.id
+              idempotency_key task.run_id + ":" + $stop.id;
+      };
 
       log_dose: record feed.delivered {
         station        = $stop.id;
