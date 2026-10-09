@@ -53,3 +53,31 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+
+  virtual-lab:
+    # The app is not covered by `npm run verify`: the root typecheck does not see
+    # Vue single-file components, and only a real build proves that Nitro can
+    # bundle the workspace packages' TypeScript sources.
+    name: Virtual Lab typecheck and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare Nuxt types
+        run: npm run prepare --workspace apps/virtual-lab
+
+      - name: Typecheck the app
+        run: npm run typecheck --workspace apps/virtual-lab
+
+      - name: Build the app
+        run: npm run build --workspace apps/virtual-lab

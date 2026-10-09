@@ -28,10 +28,17 @@ Individual steps:
 | --- | --- |
 | `npm run check:tree` | Required boundaries exist; no safety-controller code outside the safety path |
 | `npm run check:links` | Every relative Markdown link resolves |
-| `npm run typecheck` | Strict TypeScript across `packages/*` |
+| `npm run typecheck` | Strict TypeScript across `packages/*` and `apps/*/test` |
 | `npm run lint` | ESLint (flat config, `typescript-eslint`) |
 | `npm run format` / `npm run format:check` | Prettier for code and configuration |
-| `npm test` | Vitest unit and contract tests |
+| `npm test` | Vitest unit and contract tests, including `apps/*/test` |
+| `npm run dev --workspace apps/virtual-lab` | The Virtual Lab on `http://localhost:3000` |
+| `npm run typecheck --workspace apps/virtual-lab` | `vue-tsc` over the app's `app/`, `server/` and shared modules |
+| `npm run build --workspace apps/virtual-lab` | Proves Nitro can bundle the workspace packages' TypeScript sources |
+
+The Virtual Lab's typecheck and build run as their own CI job: `npm run verify`
+cannot see Vue single-file components, and only a real build proves the server
+bundle resolves. Do not merge with either job failing.
 
 Authored engineering documents under `docs/`, `dsl/` and `drawings/` keep their
 own hand formatting and are excluded from Prettier.
