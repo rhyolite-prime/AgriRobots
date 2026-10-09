@@ -73,8 +73,15 @@ export interface TwinNestSlot {
   confidence: number;
 }
 
-/** Geometry and telemetry the 3D twin draws. Compact enough to journal per step. */
+/**
+ * Geometry and telemetry the 3D twin draws. Compact enough to journal per step.
+ *
+ * `runMission` returns these ordered by `t` (mission milliseconds), which is what
+ * a playback timeline needs; the `twin.frame` journal entries stay in the causal
+ * order the interpreter wrote them.
+ */
 export interface TwinFrame {
+  /** Mission-relative time in milliseconds, from the mission clock. */
   t: number;
   carrier: {
     x: number;

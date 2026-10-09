@@ -19,6 +19,7 @@ installation beyond an in-memory map, and any bridge to ROS 2.
 .agri source -> [@agrirobots/compiler-core] -> AST -> IR + irHash
              -> [@agrirobots/policy]          -> allow-list, gates, permits
              -> [x] preflight  -> [x] interpret -> [x] journal + twin frames
+             -> [x] apps/virtual-lab (Nuxt 4: replays journal, safety, frames)
              -> [ ] checkpoint store (SQLite on the edge, in memory here)
              -> [ ] ROS 2 bridge (Jazzy) -> real AR-01
 ```
@@ -60,6 +61,13 @@ installation beyond an in-memory map, and any bridge to ROS 2.
   suspended so an operator reply is bound on the second pass.
 - **Determinism.** Same seed, same world, same journal hash. That hash is the
   equivalence contract between this engine and the C++ one.
+- **Trace ordering.** The journal is causal: `sequence` increases in the order
+  the interpreter decided things, and at a parallel join branches are flushed in
+  branch order, so mission time can step backwards across the join. The
+  `twinFrames` a mission returns are a playback timeline and are sorted by `t`
+  (stably, so equal timestamps keep emit order). A consumer that scrubs by time
+  sorts the journal on (`elapsedMs`, `sequence`); `apps/virtual-lab` does exactly
+  that in `app/shared/journal-lines.ts`.
 
 ## Exit codes
 
@@ -81,7 +89,10 @@ faults (`seal_loss`, `presence`, `tilt`, `force_overrun`, `vacuum_decay`,
 so all eight shoulders reach; `'straight'` is a single run, which only six hands
 can work — the geometry is still an open assumption in
 [`docs/10_ARACNID_AR01_DESIGN_BASIS.md`](../../docs/10_ARACNID_AR01_DESIGN_BASIS.md)
-section 9.
+section 9. Every number the world uses — nest bank, ring radius, arm envelope,
+cup, force limits, speeds, the 6 deg tip-over trip, tray standard, battery — is a
+placeholder, and section 9.1 of that document lists each one against the
+measurement that closes it.
 
 ## Rules for the next implementation step
 

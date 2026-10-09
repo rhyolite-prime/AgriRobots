@@ -541,7 +541,13 @@ function finish(args: FinishArgs): MissionResult {
     { safetyState: state },
   );
 
-  const frames: TwinFrame[] = args.interpreter.twinFrames;
+  // Parallel branches are flushed at the join in branch order, so a frame taken
+  // earlier in mission time can be recorded later. The journal keeps that causal
+  // order; the frame list is a playback timeline, so it is sorted by `t` here.
+  // The sort is stable, so frames sharing a timestamp stay in emit order.
+  const frames: TwinFrame[] = [...args.interpreter.twinFrames].sort(
+    (left, right) => left.t - right.t,
+  );
   const completed = args.journal.of('statement.completed');
   const lastStatement = completed[completed.length - 1];
   const cursorPayload = (lastStatement?.payload ?? {}) as Record<string, unknown>;
