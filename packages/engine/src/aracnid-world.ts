@@ -22,6 +22,12 @@ import type {
  */
 export const ARACNID = {
   handCount: 8,
+  /**
+   * Shoulder base angles in degrees, hand_1 … hand_8: two banks of four, 45 deg
+   * apart (docs/10 §5), bank 1 facing the nest. Published so a renderer draws
+   * the ring the world actually uses instead of guessing it.
+   */
+  shoulderBaseAnglesDeg: [-67.5, -22.5, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5],
   /** Shoulder ring radius, m (placeholder: ring diameter is not yet frozen). */
   ringRadiusM: 0.31,
   /** Arm ring height above datum A, mm (docs/10 §5). */
@@ -285,10 +291,7 @@ export class AracnidWorld implements WorldModel {
 
   private layoutArms(): void {
     for (let index = 0; index < ARACNID.handCount; index += 1) {
-      // Two banks of four, 45 deg apart (docs/10 §5); bank 1 faces the nest.
-      const bank = index < 4 ? 0 : 1;
-      const within = index % 4;
-      const baseAngleDeg = bank * 180 + (within - 1.5) * 45;
+      const baseAngleDeg = ARACNID.shoulderBaseAnglesDeg[index] ?? index * 45 - 67.5;
       this.arms.push({
         id: `hand_${String(index + 1)}`,
         shoulderYaw: 0,

@@ -399,10 +399,14 @@ export class Interpreter {
           break;
         }
         case 'degrade_to': {
+          const from = this.degraded;
           this.degraded = statement.mode as DegradedMode;
-          this.options.journal.emit('safety.state_changed', {
+          // A degradation is the task's operating mode, not the safety state:
+          // the safety model still owns AUTO_TASK / SAFE_STOP / UNKNOWN.
+          this.options.journal.emit('mode.degraded', {
             id: statement.id,
-            degradedTo: statement.mode,
+            from: from ?? 'full',
+            to: statement.mode,
             reason: statement.reason ? formatValue(this.eval(statement.reason)) : '',
           });
           break;
@@ -467,6 +471,32 @@ export class Interpreter {
 
   // -- motion ----------------------------------------------------------------
 
+  /**
+   * The speed this motion may command. `degrade_to reduced_speed` halves the
+   * task's own travel-speed limit and journals the cap, so a slower round is
+   * explainable from the trace instead of looking like a machine fault.
+   */
+  private speedLimitFor(
+    statement: Extract<IrStmt, { kind: 'move' | 'dock' | 'return_to' }>,
+  ): Quantity | undefined {
+    const commanded =
+      'speed' in statement && statement.speed ? (statement.speed as Quantity) : undefined;
+    if (this.degraded !== 'reduced_speed') return commanded;
+
+    const limit = this.options.compiled.ir.limits.find((entry) => entry.key === 'travel_speed');
+    if (!limit) return commanded;
+    const cap: Quantity = { value: limit.value / 2, unit: limit.unit };
+    const applied =
+      commanded && commanded.unit === cap.unit && commanded.value <= cap.value ? commanded : cap;
+    this.options.journal.emit('mode.speed_capped', {
+      id: statement.id,
+      commanded: commanded ?? null,
+      applied,
+      cap,
+    });
+    return applied;
+  }
+
   private *execMotion(
     statement: Extract<IrStmt, { kind: 'move' | 'dock' | 'return_to' }>,
     scope: Scope,
@@ -490,16 +520,24 @@ export class Interpreter {
         true,
       );
     }
+    if (this.degraded === 'return_to_dock' && statement.kind === 'move') {
+      // Getting home is allowed; roaming is not.
+      throw new FaultSignal(
+        statement.id,
+        'E_DEGRADED',
+        'free travel is refused while degraded to return_to_dock; only dock and return_to remain',
+        true,
+      );
+    }
 
     const resources = [...new Set([...scope.branchClaims, 'traction'])];
     this.authorize(statement.id, statement.kind, resources, scope, undefined);
 
+    const speedLimit = this.speedLimitFor(statement);
     const call: TravelCall = {
       kind: statement.kind,
       target,
-      ...('speed' in statement && statement.speed
-        ? { speedLimit: statement.speed as Quantity }
-        : {}),
+      ...(speedLimit ? { speedLimit } : {}),
       ...('tolerance' in statement && statement.tolerance
         ? { tolerance: statement.tolerance as Quantity }
         : {}),

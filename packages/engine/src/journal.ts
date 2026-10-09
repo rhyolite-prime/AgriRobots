@@ -56,6 +56,8 @@ export const JOURNAL_KINDS = [
   'await.resumed',
   'await.timeout',
   'fault.entered',
+  'mode.degraded',
+  'mode.speed_capped',
   'safety.state_changed',
   'safety.inhibited',
   'safety.function_tripped',
