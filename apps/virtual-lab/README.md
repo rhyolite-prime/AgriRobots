@@ -13,8 +13,9 @@ fault, run, scrub. Evidence, all reproduced on this branch:
 - `npm run build --workspace apps/virtual-lab` produces a Node server bundle
   (3.2 MB, 804 kB gzipped) and `node .output/server/index.mjs` serves the app and
   the API.
-- `apps/virtual-lab/test/lab-shared.test.ts` — 35 tests, run by the repository
-  root's `vitest` inside `npm run verify` (180 tests in total).
+- `apps/virtual-lab/test/` — 45 tests (35 on the isomorphic modules and server
+  utilities, 10 on frame blending and the colour vocabulary), run by the
+  repository root's `vitest` inside `npm run verify` (190 tests in total).
 - Every scenario below was executed through the running dev server's
   `POST /api/missions/run`, not quoted from a design note.
 
@@ -66,6 +67,7 @@ and why. That place is this app. It is a *reading* instrument:
 | `app/app.vue` | The console layout: three columns, no router, one view |
 | `app/assets/css/main.css` | The console look: panels, pills, journal rows, tally strip |
 | `test/lab-shared.test.ts` | The isomorphic modules and the server utilities, tested from the repository root against real runs |
+| `test/twin-scene.test.ts` | Frame blending and the state/grade colour vocabulary, tested against frames from a real round |
 
 ## The API
 
@@ -164,7 +166,15 @@ prints it. The browser only ever calls relative `/api/...` paths — nothing in
 5. **One view, no router.** The lab is a console, not a site: `app/app.vue` lays
    out three columns and there is no `pages/` directory. Nothing here needs a
    route, and a route would only add a way to lose the run in view.
-6. **A procedural twin, not an imported asset.** The rover, arms, nest bank and
+6. **The round is executed docked, and frames are snapshots.** The ARACNID task
+   has no `move` statement — the rover is already at the nest bank when the round
+   starts (`docs/10` §9.1 records that assumption), so what the twin animates is
+   the arms, the magazine and the battery, not the chassis. Twin frames are
+   published per statement, not per millisecond: 40 snapshots for a nominal round.
+   `blendFrames()` is what turns those snapshots into motion, interpolating
+   continuous values and taking discrete state (parked, arm state, grade, safety)
+   from the later frame so nothing is ever half-applied.
+7. **A procedural twin, not an imported asset.** The rover, arms, nest bank and
    trays are drawn from the geometry the engine reports (`world.geometry`), so
    the picture cannot disagree with the numbers. `packages/asset-import` and the
    GLTF/URDF path in `BOOTSTRAP.md` §2 stay unimplemented: there are no committed

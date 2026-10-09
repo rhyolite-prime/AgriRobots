@@ -20,7 +20,7 @@
     "check:tree": "node scripts/check-tree.mjs",
     "check:links": "node scripts/check-doc-links.mjs",
     "check:grammar": "node scripts/check-grammar.mjs",
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p apps/virtual-lab/tsconfig.test.json",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -1,0 +1,14 @@
+{
+  // The lab's tests run from the repository root (`npm run verify`), but they are
+  // not typechecked by `nuxt typecheck`, which covers app/, server/ and shared/
+  // only, and they cannot be typechecked by the root tsconfig.json either: they
+  // import `app/lib/twin-scene.ts`, which is client-only code and needs the DOM
+  // lib. Adding DOM to the root project would let `document` into the packages,
+  // so the tests get their own project instead.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"]
+  },
+  "include": ["test/**/*.ts"]
+}
