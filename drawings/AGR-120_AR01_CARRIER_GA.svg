@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <title>AR-01 ARACNID CARRIER — GENERAL ARRANGEMENT</title>
+  <desc>AgriRobots ARACNID engineering concept drawing. All dimensions millimetres unless noted.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto-start-reverse"><path d="M 0,0 L 9,4.5 L 0,9 z" class="dimfill"/></marker>
+    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e7ebef" stroke-width="0.7"/></pattern>
+    <style>
+      .border { fill:none; stroke:#18232e; stroke-width:2; }
+      .obj { fill:#edf3f5; stroke:#18232e; stroke-width:2.3; }
+      .dark { fill:#cbd9de; stroke:#18232e; stroke-width:2.3; }
+      .arm { fill:#dfe9ef; stroke:#18232e; stroke-width:2.4; }
+      .armline { fill:none; stroke:#18232e; stroke-width:6; stroke-linecap:round; }
+      .white { fill:#ffffff; stroke:#415661; stroke-width:1.5; }
+      .detail { fill:none; stroke:#415661; stroke-width:1.6; }
+      .hidden { fill:none; stroke:#71838d; stroke-width:1.3; stroke-dasharray:7 5; }
+      .center { fill:none; stroke:#3a94a8; stroke-width:1.1; stroke-dasharray:15 5 3 5; }
+      .dim { fill:none; stroke:#256f9b; stroke-width:1.25; marker-start:url(#arrow); marker-end:url(#arrow); }
+      .ext { fill:none; stroke:#256f9b; stroke-width:1; }
+      .lead { fill:none; stroke:#415661; stroke-width:1.1; }
+      .dimfill { fill:#256f9b; }
+      .datum { fill:#e8f4ed; stroke:#137a4a; stroke-width:1.5; }
+      .env { fill:none; stroke:#ac6d12; stroke-width:1.8; stroke-dasharray:8 5; }
+      .stop { fill:none; stroke:#a12626; stroke-width:2; }
+      .estop { fill:#fde7e7; stroke:#a12626; stroke-width:1.6; }
+      .label { font: 16px Arial, sans-serif; fill:#18232e; }
+      .small { font: 13px Arial, sans-serif; fill:#263842; }
+      .tiny { font: 11px Arial, sans-serif; fill:#263842; }
+      .note { font: 12.5px Arial, sans-serif; fill:#263842; }
+      .dimtxt { font: 14px Arial, sans-serif; font-weight:bold; fill:#256f9b; }
+      .view { font: bold 16px Arial, sans-serif; fill:#18232e; }
+      .title { font: bold 25px Arial, sans-serif; fill:#18232e; }
+      .tb { font: 12px Arial, sans-serif; fill:#18232e; }
+      .tbhead { font: bold 12px Arial, sans-serif; fill:#18232e; }
+      .th { font: bold 12px Arial, sans-serif; fill:#18232e; }
+      .tc { font: 11.5px Arial, sans-serif; fill:#263842; }
+    </style>
+  </defs>
+
+  <rect x="20" y="20" width="1560" height="1010" class="border"/>
+  <rect x="45" y="45" width="1510" height="960" fill="url(#grid)"/>
+  <text x="60" y="78" class="title">AR-01 ARACNID CARRIER — GENERAL ARRANGEMENT</text>
+  <text x="60" y="101" class="small">CONCEPT — NOT FOR FABRICATION · ALL DIMENSIONS IN mm · diagrammatic scale, verify with released CAD · X fwd, Y left, Z up</text>
+<text x="60" y="140" class="view">PLAN VIEW — EG-08 stowed, deployed envelope</text>
+<circle cx="320" cy="385" r="202" class="env"/>
+<rect x="231" y="257" width="178" height="256" rx="10" class="obj"/>
+<rect x="239" y="267" width="14" height="42" rx="5" class="dark"/>
+<rect x="239" y="461" width="14" height="42" rx="5" class="dark"/>
+<rect x="387" y="267" width="14" height="42" rx="5" class="dark"/>
+<rect x="387" y="461" width="14" height="42" rx="5" class="dark"/>
+<rect x="275" y="315" width="90" height="140" rx="4" class="datum"/>
+<circle cx="320" cy="326" r="5.5" class="arm"/>
+<path d="M 320 326 L 320 192" class="hidden"/>
+<text x="320" y="174" text-anchor="middle" class="tiny">H1</text>
+<circle cx="362" cy="343" r="5.5" class="arm"/>
+<path d="M 362 343 L 457 248" class="hidden"/>
+<text x="472" y="237" text-anchor="middle" class="tiny">H2</text>
+<circle cx="379" cy="385" r="5.5" class="arm"/>
+<path d="M 379 385 L 514 385" class="hidden"/>
+<text x="536" y="389" text-anchor="middle" class="tiny">H3</text>
+<circle cx="362" cy="427" r="5.5" class="arm"/>
+<path d="M 362 427 L 457 522" class="hidden"/>
+<text x="472" y="541" text-anchor="middle" class="tiny">H4</text>
+<circle cx="320" cy="444" r="5.5" class="arm"/>
+<path d="M 320 444 L 320 578" class="hidden"/>
+<text x="320" y="604" text-anchor="middle" class="tiny">H5</text>
+<circle cx="278" cy="427" r="5.5" class="arm"/>
+<path d="M 278 427 L 183 522" class="hidden"/>
+<text x="168" y="541" text-anchor="middle" class="tiny">H6</text>
+<circle cx="261" cy="385" r="5.5" class="arm"/>
+<path d="M 261 385 L 126 385" class="hidden"/>
+<text x="104" y="389" text-anchor="middle" class="tiny">H7</text>
+<circle cx="278" cy="343" r="5.5" class="arm"/>
+<path d="M 278 343 L 183 248" class="hidden"/>
+<text x="168" y="237" text-anchor="middle" class="tiny">H8</text>
+<circle cx="320" cy="385" r="59" class="center"/>
+<circle cx="320" cy="385" r="15" class="dark"/>
+<circle cx="239" cy="265" r="4.5" class="estop"/>
+<circle cx="239" cy="505" r="4.5" class="estop"/>
+<circle cx="401" cy="265" r="4.5" class="estop"/>
+<circle cx="401" cy="505" r="4.5" class="estop"/>
+<path d="M 320 370 L 415 265" class="lead"/><circle cx="320" cy="370" r="2.4" fill="#415661"/><text x="419" y="262" class="tiny" text-anchor="start">arm ring · 8 shoulders @45° · magazine</text>
+<path d="M 281 449 L 110 560" class="lead"/><circle cx="281" cy="449" r="2.4" fill="#415661"/><text x="114" y="557" class="tiny" text-anchor="start">UCI-01 footprint 900 × 580</text>
+<path d="M 401 505 L 440 560" class="lead"/><circle cx="401" cy="505" r="2.4" fill="#415661"/><text x="444" y="557" class="tiny" text-anchor="start">e-stop (4)</text>
+<path d="M 175 257 H 207" class="ext"/><path d="M 175 513 H 207" class="ext"/><path d="M 191 257 V 513" class="dim"/><text x="183" y="385" class="dimtxt" text-anchor="end" transform="rotate(-90 183 385)">1650 L</text>
+<path d="M 231 529 V 561" class="ext"/><path d="M 409 529 V 561" class="ext"/><path d="M 231 545 H 409" class="dim"/><text x="320" y="532" class="dimtxt" text-anchor="middle">1150 W</text>
+<path d="M 246 217 V 249" class="ext"/><path d="M 394 217 V 249" class="ext"/><path d="M 246 233 H 394" class="dim"/><text x="320" y="239" class="dimtxt" text-anchor="middle">950 TRACK</text>
+<path d="M 435 288 H 467" class="ext"/><path d="M 435 482 H 467" class="ext"/><path d="M 451 288 V 482" class="dim"/><text x="471" y="385" class="dimtxt" text-anchor="start" transform="rotate(-90 471 385)">1250 WB</text>
+<path d="M 118 602 V 634" class="ext"/><path d="M 522 602 V 634" class="ext"/><path d="M 118 618 H 522" class="dim"/><text x="320" y="606" class="dimtxt" text-anchor="middle">Ø2600 DEPLOYED ENVELOPE / EXCLUSION ZONE</text>
+<text x="600" y="140" class="view">SIDE VIEW — stowed profile, deployed reach</text>
+<path d="M 630 430 H 984.0" class="detail"/>
+<rect x="670" y="318" width="244" height="37" rx="8" class="obj"/>
+<circle cx="695" cy="394" r="36" class="dark"/>
+<circle cx="695" cy="394" r="30" class="detail"/>
+<circle cx="889" cy="394" r="36" class="dark"/>
+<circle cx="889" cy="394" r="30" class="detail"/>
+<rect x="690" y="355" width="204" height="42" class="dark"/>
+<rect x="720" y="182" width="144" height="136" rx="5" class="datum"/>
+<path d="M 792 318 L 862 258 L 897 293" class="armline"/>
+<circle cx="897" cy="293" r="6" class="arm"/>
+<path d="M 891 318 A 99 99 0 0 0 792 219" class="env"/>
+<text x="876" y="190" class="tiny">deployed reach 620</text>
+<path d="M 726 190 L 640 162" class="lead"/><circle cx="726" cy="190" r="2.4" fill="#415661"/><text x="644" y="159" class="tiny" text-anchor="start">EG-08 stowed ≤850 above datum A</text>
+<path d="M 604 430 H 636" class="ext"/><path d="M 604 182 H 636" class="ext"/><path d="M 620 430 V 182" class="dim"/><text x="612" y="306" class="dimtxt" text-anchor="end" transform="rotate(-90 612 306)">1120 STOWED H</text>
+<path d="M 940 430 H 972" class="ext"/><path d="M 940 396 H 972" class="ext"/><path d="M 956 430 V 396" class="dim"/><text x="976" y="413" class="dimtxt" text-anchor="start" transform="rotate(-90 976 413)">210 CLEAR</text>
+<path d="M 980 430 H 1012" class="ext"/><path d="M 980 331 H 1012" class="ext"/><path d="M 996 430 V 331" class="dim"/><text x="1016" y="380" class="dimtxt" text-anchor="start" transform="rotate(-90 1016 380)">620 RING</text>
+<path d="M 670 444 V 476" class="ext"/><path d="M 914 444 V 476" class="ext"/><path d="M 670 460 H 914" class="dim"/><text x="792" y="447" class="dimtxt" text-anchor="middle">1650</text>
+<text x="600" y="500" class="view">FRONT VIEW — track, tip-over axis</text>
+<path d="M 542 770 H 1058" class="detail"/>
+<rect x="708" y="591" width="184" height="104" rx="6" class="obj"/>
+<rect x="715" y="692" width="18" height="78" rx="6" class="dark"/>
+<rect x="867" y="692" width="18" height="78" rx="6" class="dark"/>
+<path d="M 605 539 A 208 208 0 0 1 995 539" class="env"/>
+<path d="M 760 610 L 605 539" class="arm"/>
+<circle cx="605" cy="539" r="6" class="arm"/>
+<path d="M 840 610 L 995 539" class="arm"/>
+<circle cx="995" cy="539" r="6" class="arm"/>
+<circle cx="653" cy="463" r="4" class="arm"/>
+<circle cx="800" cy="402" r="4" class="arm"/>
+<circle cx="947" cy="463" r="4" class="arm"/>
+<path d="M 724 782 H 876" class="stop"/>
+<text x="800" y="864" text-anchor="middle" class="tiny">tip-over axis — deployed-arm load case governs (doc 10 §3.1)</text>
+<path d="M 708 798 V 830" class="ext"/><path d="M 892 798 V 830" class="ext"/><path d="M 708 814 H 892" class="dim"/><text x="800" y="801" class="dimtxt" text-anchor="middle">1150</text>
+<path d="M 592 826 V 858" class="ext"/><path d="M 1008 826 V 858" class="ext"/><path d="M 592 842 H 1008" class="dim"/><text x="800" y="829" class="dimtxt" text-anchor="middle">Ø2600</text>
+<path d="M 532 770 H 564" class="ext"/><path d="M 532 402 H 564" class="ext"/><path d="M 548 770 V 402" class="dim"/><text x="540" y="586" class="dimtxt" text-anchor="end" transform="rotate(-90 540 586)">1480 DEPLOYED H</text>
+<text x="60" y="660" class="view">UCI-01 CASSETTE BAY — plan detail</text>
+<rect x="95" y="680" width="151" height="234" rx="4" class="datum"/>
+<circle cx="116" cy="713" r="6" class="dark"/>
+<circle cx="225" cy="713" r="6" class="dark"/>
+<circle cx="116" cy="881" r="6" class="dark"/>
+<circle cx="225" cy="881" r="6" class="dark"/>
+<rect x="137" y="750" width="66" height="94" class="white"/>
+<path d="M 95 924 V 956" class="ext"/><path d="M 246 924 V 956" class="ext"/><path d="M 95 940 H 246" class="dim"/><text x="170" y="927" class="dimtxt" text-anchor="middle">580</text>
+<path d="M 49 680 H 81" class="ext"/><path d="M 49 914 H 81" class="ext"/><path d="M 65 680 V 914" class="dim"/><text x="57" y="797" class="dimtxt" text-anchor="end" transform="rotate(-90 57 797)">900</text>
+<path d="M 143 756 L 272 710" class="lead"/><circle cx="143" cy="756" r="2.4" fill="#415661"/><text x="276" y="707" class="tiny" text-anchor="start">keyed power/data connector</text>
+<path d="M 238 758 L 272 809" class="lead"/><circle cx="238" cy="758" r="2.4" fill="#415661"/><text x="276" y="806" class="tiny" text-anchor="start">4 × M12 clamps · latch + ID</text>
+<rect x="1060" y="140" width="430" height="136" class="border" fill="#f8fafb"/>
+<text x="1067" y="155" class="th">ITEM</text>
+<text x="1217" y="155" class="th">TARGET</text>
+<text x="1347" y="155" class="th">VERIFY</text>
+<path d="M 1060 162 H 1490" class="detail" stroke-width="1"/>
+<path d="M 1060 181 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="175.5" class="tc">Carrier dry mass</text>
+<text x="1217" y="175.5" class="tc">≈245 kg</text>
+<text x="1347" y="175.5" class="tc">weigh-in VVT-STB-*</text>
+<path d="M 1060 200 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="194.5" class="tc">Payload @ UCI-01</text>
+<text x="1217" y="194.5" class="tc">165 kg</text>
+<text x="1347" y="194.5" class="tc">stability + latch</text>
+<path d="M 1060 219 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="213.5" class="tc">Speed open/aisle/arms</text>
+<text x="1217" y="213.5" class="tc">0.60/0.35/0.15 m/s</text>
+<text x="1347" y="213.5" class="tc">zone+mode caps</text>
+<path d="M 1060 238 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="232.5" class="tc">Grade/obstacle/gap</text>
+<text x="1217" y="232.5" class="tc">8 % / 30 / 120</text>
+<text x="1347" y="232.5" class="tc">site survey</text>
+<path d="M 1060 257 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="251.5" class="tc">Energy</text>
+<text x="1217" y="251.5" class="tc">48 V · 120 Ah</text>
+<text x="1347" y="251.5" class="tc">sortie bench</text>
+<path d="M 1060 276 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="270.5" class="tc">Arm ring height</text>
+<text x="1217" y="270.5" class="tc">620 above datum A</text>
+<text x="1347" y="270.5" class="tc">AGR-210</text>
+<path d="M 1210 140 V 276" class="detail" stroke-width="0.7"/>
+<path d="M 1340 140 V 276" class="detail" stroke-width="0.7"/>
+<rect x="1060" y="300" width="430" height="136" class="border" fill="#f8fafb"/>
+<text x="1067" y="315" class="th">SAFETY</text>
+<text x="1147" y="315" class="th">FUNCTION</text>
+<path d="M 1060 322 H 1490" class="detail" stroke-width="1"/>
+<path d="M 1060 341 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="335.5" class="tc">SF-AR-01</text>
+<text x="1147" y="335.5" class="tc">e-stop ×4 + HMI: torque off, brake, vent</text>
+<path d="M 1060 360 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="354.5" class="tc">SF-AR-02</text>
+<text x="1147" y="354.5" class="tc">arm-envelope scanner breach: arms hold</text>
+<path d="M 1060 379 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="373.5" class="tc">SF-AR-05</text>
+<text x="1147" y="373.5" class="tc">latch/ID mismatch: inhibit tool+travel</text>
+<path d="M 1060 398 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="392.5" class="tc">SF-AR-06</text>
+<text x="1147" y="392.5" class="tc">deploy interlock: parked + permitted</text>
+<path d="M 1060 417 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="411.5" class="tc">SF-AR-08</text>
+<text x="1147" y="411.5" class="tc">tilt beyond limit: remove energy</text>
+<path d="M 1060 436 H 1490" class="detail" stroke-width="0.7"/>
+<text x="1067" y="430.5" class="tc">SF-AR-09</text>
+<text x="1147" y="430.5" class="tc">heartbeat loss: controlled stop, vent</text>
+<path d="M 1140 300 V 436" class="detail" stroke-width="0.7"/>
+<text x="1060" y="470" class="note">1. AR-01 is a new carrier: wider track and a 165 kg payload rating than</text>
+<text x="1060" y="487" class="note">   AP-01 because eight deployed arms move the CG outward. UCI-01</text>
+<text x="1060" y="504" class="note">   geometry, clamps, connector and latch/ID interlock are unchanged, so</text>
+<text x="1060" y="521" class="note">   FD-01 and CS-01 still mount here.</text>
+<text x="1060" y="538" class="note">2. No tolerance is implied by any number on this sheet. Release</text>
+<text x="1060" y="555" class="note">   requires parametric CAD, FEA, measured mass/CG, tolerance stack-up</text>
+<text x="1060" y="572" class="note">   and GD&amp;T.</text>
+<text x="1060" y="589" class="note">3. The deployed envelope is an exclusion zone monitored by arm-envelope</text>
+<text x="1060" y="606" class="note">   scanners; it is not a travel corridor. Arms deploy only when</text>
+<text x="1060" y="623" class="note">   parked/braked and tool_energy is granted.</text>
+<text x="1060" y="640" class="note">4. The deployed-arm load case governs stability. Remedies in order:</text>
+<text x="1060" y="657" class="note">   interleave banks, ballast/outriggers, reduce reach, widen track. A</text>
+<text x="1060" y="674" class="note">   software speed cap is not a stability remedy.</text>
+<text x="300" y="900" class="note">Kinematics: AGR-130 · cassette + traceability: AGR-210 · basis: docs/10_ARACNID_AR01_DESIGN_BASIS.md</text>
+<text x="430" y="918" class="note">Origin: ground projection of cassette-bay centre. Datum A = cassette support plane.</text>
+  <g transform="translate(1010,870)">
+    <rect x="0" y="0" width="545" height="135" class="border" fill="#f8fafb"/>
+    <path d="M 0 30 H 545 M 0 75 H 545 M 170 0 V 135 M 365 0 V 135" class="detail"/>
+    <text x="10" y="20" class="tbhead">PROJECT / DRAWING</text><text x="180" y="20" class="tbhead">REV</text><text x="375" y="20" class="tbhead">STATUS</text>
+    <text x="10" y="52" class="tb">AgriRobots / AGR-120</text><text x="180" y="52" class="tb">A · 09 OCT 2026</text><text x="375" y="52" class="tb">CONCEPT</text>
+    <text x="10" y="96" class="tbhead">TITLE</text><text x="10" y="115" class="tb">AR-01 CARRIER GA</text>
+    <text x="180" y="96" class="tbhead">UNITS</text><text x="180" y="115" class="tb">mm / kg / N / kPa as marked</text>
+    <text x="375" y="96" class="tbhead">RELEASE</text><text x="375" y="115" class="tb">NOT FOR FABRICATION</text>
+  </g>
+
+</svg>

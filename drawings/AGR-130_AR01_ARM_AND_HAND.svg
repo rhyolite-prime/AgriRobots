@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <title>AR-01 PICKING ARM AND COMPLIANT SUCTION HAND</title>
+  <desc>AgriRobots ARACNID engineering concept drawing. All dimensions millimetres unless noted.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto-start-reverse"><path d="M 0,0 L 9,4.5 L 0,9 z" class="dimfill"/></marker>
+    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e7ebef" stroke-width="0.7"/></pattern>
+    <style>
+      .border { fill:none; stroke:#18232e; stroke-width:2; }
+      .obj { fill:#edf3f5; stroke:#18232e; stroke-width:2.3; }
+      .dark { fill:#cbd9de; stroke:#18232e; stroke-width:2.3; }
+      .arm { fill:#dfe9ef; stroke:#18232e; stroke-width:2.4; }
+      .armline { fill:none; stroke:#18232e; stroke-width:6; stroke-linecap:round; }
+      .white { fill:#ffffff; stroke:#415661; stroke-width:1.5; }
+      .detail { fill:none; stroke:#415661; stroke-width:1.6; }
+      .hidden { fill:none; stroke:#71838d; stroke-width:1.3; stroke-dasharray:7 5; }
+      .center { fill:none; stroke:#3a94a8; stroke-width:1.1; stroke-dasharray:15 5 3 5; }
+      .dim { fill:none; stroke:#256f9b; stroke-width:1.25; marker-start:url(#arrow); marker-end:url(#arrow); }
+      .ext { fill:none; stroke:#256f9b; stroke-width:1; }
+      .lead { fill:none; stroke:#415661; stroke-width:1.1; }
+      .dimfill { fill:#256f9b; }
+      .datum { fill:#e8f4ed; stroke:#137a4a; stroke-width:1.5; }
+      .env { fill:none; stroke:#ac6d12; stroke-width:1.8; stroke-dasharray:8 5; }
+      .stop { fill:none; stroke:#a12626; stroke-width:2; }
+      .estop { fill:#fde7e7; stroke:#a12626; stroke-width:1.6; }
+      .label { font: 16px Arial, sans-serif; fill:#18232e; }
+      .small { font: 13px Arial, sans-serif; fill:#263842; }
+      .tiny { font: 11px Arial, sans-serif; fill:#263842; }
+      .note { font: 12.5px Arial, sans-serif; fill:#263842; }
+      .dimtxt { font: 14px Arial, sans-serif; font-weight:bold; fill:#256f9b; }
+      .view { font: bold 16px Arial, sans-serif; fill:#18232e; }
+      .title { font: bold 25px Arial, sans-serif; fill:#18232e; }
+      .tb { font: 12px Arial, sans-serif; fill:#18232e; }
+      .tbhead { font: bold 12px Arial, sans-serif; fill:#18232e; }
+      .th { font: bold 12px Arial, sans-serif; fill:#18232e; }
+      .tc { font: 11.5px Arial, sans-serif; fill:#263842; }
+    </style>
+  </defs>
+
+  <rect x="20" y="20" width="1560" height="1010" class="border"/>
+  <rect x="45" y="45" width="1510" height="960" fill="url(#grid)"/>
+  <text x="60" y="78" class="title">AR-01 PICKING ARM AND COMPLIANT SUCTION HAND</text>
+  <text x="60" y="101" class="small">CONCEPT — NOT FOR FABRICATION · ALL DIMENSIONS IN mm · diagrammatic scale, verify with released CAD · X fwd, Y left, Z up</text>
+<text x="60" y="140" class="view">ARM ELEVATION — 3 DOF + passive compliance</text>
+<rect x="180" y="490" width="140" height="46" rx="6" class="dark"/>
+<text x="250" y="562" text-anchor="middle" class="tiny">shoulder yaw ring · 620 above datum A</text>
+<path d="M 250 500 L 381 398" stroke="#18232e" stroke-width="15" stroke-linecap="round" fill="none"/>
+<path d="M 381 398 L 536 376" stroke="#18232e" stroke-width="11" stroke-linecap="round" fill="none"/>
+<circle cx="250" cy="500" r="13" class="arm"/><circle cx="381" cy="398" r="11" class="arm"/><circle cx="536" cy="376" r="9" class="arm"/>
+<path d="M 536 376 L 544 434" stroke="#18232e" stroke-width="7" fill="none"/>
+<path d="M 524 434 q 20 26 40 0" class="arm"/>
+<path d="M 572 500 A 322 322 0 0 0 435 236" class="env"/>
+<path d="M 250 500 H 572" class="center"/>
+<path d="M 250 584 V 616" class="ext"/><path d="M 572 584 V 616" class="ext"/><path d="M 250 600 H 572" class="dim"/><text x="411" y="587" class="dimtxt" text-anchor="middle">620 REACH FROM SHOULDER</text>
+<path d="M 286 500 A 36 36 0 0 0 278 478" class="dim"/>
+<text x="296" y="474" class="tiny">J1 yaw ±95°</text>
+<text x="395" y="372" class="tiny">J2 pitch −20…+110°</text>
+<text x="552" y="364" class="tiny">J3 pitch ±75° · compliance ±12°</text>
+<path d="M 250 500 L 120 640" class="lead"/><circle cx="250" cy="500" r="2.4" fill="#415661"/><text x="124" y="637" class="tiny" text-anchor="start">brushless joint modules with holding brakes</text>
+<path d="M 544 450 L 604 544" class="lead"/><circle cx="544" cy="450" r="2.4" fill="#415661"/><text x="608" y="541" class="tiny" text-anchor="start">compliant suction hand · see detail</text>
+<path d="M 381 398 L 321 308" class="lead"/><circle cx="381" cy="398" r="2.4" fill="#415661"/><text x="325" y="305" class="tiny" text-anchor="start">cable chain inside link</text>
+<text x="980" y="140" class="view">HAND DETAIL — SECTION (enlarged)</text>
+<path d="M 1110 350 q 40 34 80 0" class="arm"/>
+<path d="M 1116 340 q 8 -14 0 -22 q 8 -10 0 -20 q 8 -10 0 -18" class="detail"/>
+<path d="M 1184 340 q -8 -14 0 -22 q -8 -10 0 -20 q -8 -10 0 -18" class="detail"/>
+<rect x="1124" y="240" width="52" height="40" rx="5" class="obj"/>
+<rect x="1116" y="200" width="68" height="40" rx="6" class="white"/>
+<rect x="1136" y="174" width="28" height="26" class="dark"/>
+<path d="M 1184 220 h 46" class="detail"/>
+<circle cx="1242" cy="220" r="8" class="white"/>
+<path d="M 1150 358 L 1060 410" class="lead"/><circle cx="1150" cy="358" r="2.4" fill="#415661"/><text x="1056" y="407" class="tiny" text-anchor="end">silicone compliant cup Ø38 · food-contact ⚠</text>
+<path d="M 1116 318 L 1060 360" class="lead"/><circle cx="1116" cy="318" r="2.4" fill="#415661"/><text x="1056" y="357" class="tiny" text-anchor="end">bellows: passive compliance ±12°</text>
+<path d="M 1150 260 L 1060 310" class="lead"/><circle cx="1150" cy="260" r="2.4" fill="#415661"/><text x="1056" y="307" class="tiny" text-anchor="end">6-axis force cell 0–30 N ±0.2 N</text>
+<path d="M 1150 220 L 1060 260" class="lead"/><circle cx="1150" cy="220" r="2.4" fill="#415661"/><text x="1056" y="257" class="tiny" text-anchor="end">vacuum chamber + seal-quality sensing</text>
+<path d="M 1150 187 L 1060 210" class="lead"/><circle cx="1150" cy="187" r="2.4" fill="#415661"/><text x="1056" y="207" class="tiny" text-anchor="end">wrist interface to J3</text>
+<path d="M 1242 220 L 1250 160" class="lead"/><circle cx="1242" cy="220" r="2.4" fill="#415661"/><text x="1254" y="157" class="tiny" text-anchor="start">vent valve (fail-safe open)</text>
+<path d="M 1294 174 H 1326" class="ext"/><path d="M 1294 358 H 1326" class="ext"/><path d="M 1310 174 V 358" class="dim"/><text x="1302" y="266" class="dimtxt" text-anchor="end" transform="rotate(-90 1302 266)">≈120 STACK</text>
+<text x="1150" y="450" text-anchor="middle" class="tiny">vacuum 12–25 kPa differential · normal force 12 N hard / 6 N set</text>
+<rect x="60" y="660" width="460" height="98" class="border" fill="#f8fafb"/>
+<text x="67" y="675" class="th">JOINT</text>
+<text x="207" y="675" class="th">RANGE</text>
+<text x="317" y="675" class="th">SPEED (max)</text>
+<text x="417" y="675" class="th">HOLD</text>
+<path d="M 60 682 H 520" class="detail" stroke-width="1"/>
+<path d="M 60 701 H 520" class="detail" stroke-width="0.7"/>
+<text x="67" y="695.5" class="tc">J1 shoulder yaw</text>
+<text x="207" y="695.5" class="tc">±95°</text>
+<text x="317" y="695.5" class="tc">60°/s</text>
+<text x="417" y="695.5" class="tc">brake + MCU</text>
+<path d="M 60 720 H 520" class="detail" stroke-width="0.7"/>
+<text x="67" y="714.5" class="tc">J2 elbow pitch</text>
+<text x="207" y="714.5" class="tc">−20…+110°</text>
+<text x="317" y="714.5" class="tc">90°/s</text>
+<text x="417" y="714.5" class="tc">brake + MCU</text>
+<path d="M 60 739 H 520" class="detail" stroke-width="0.7"/>
+<text x="67" y="733.5" class="tc">J3 wrist pitch</text>
+<text x="207" y="733.5" class="tc">±75°</text>
+<text x="317" y="733.5" class="tc">120°/s</text>
+<text x="417" y="733.5" class="tc">brake + MCU</text>
+<path d="M 60 758 H 520" class="detail" stroke-width="0.7"/>
+<text x="67" y="752.5" class="tc">hand compliance</text>
+<text x="207" y="752.5" class="tc">±12° passive</text>
+<text x="317" y="752.5" class="tc">—</text>
+<text x="417" y="752.5" class="tc">mechanical</text>
+<path d="M 200 660 V 758" class="detail" stroke-width="0.7"/>
+<path d="M 310 660 V 758" class="detail" stroke-width="0.7"/>
+<path d="M 410 660 V 758" class="detail" stroke-width="0.7"/>
+<rect x="560" y="660" width="380" height="117" class="border" fill="#f8fafb"/>
+<text x="567" y="675" class="th">CYCLE ELEMENT</text>
+<text x="717" y="675" class="th">TARGET</text>
+<text x="797" y="675" class="th">SOURCE</text>
+<path d="M 560 682 H 940" class="detail" stroke-width="1"/>
+<path d="M 560 701 H 940" class="detail" stroke-width="0.7"/>
+<text x="567" y="695.5" class="tc">scan + confidence</text>
+<text x="717" y="695.5" class="tc">0.6 s</text>
+<text x="797" y="695.5" class="tc">nest vision</text>
+<path d="M 560 720 H 940" class="detail" stroke-width="0.7"/>
+<text x="567" y="714.5" class="tc">align + approach</text>
+<text x="717" y="714.5" class="tc">2.5 s</text>
+<text x="797" y="714.5" class="tc">hand cam</text>
+<path d="M 560 739 H 940" class="detail" stroke-width="0.7"/>
+<text x="567" y="733.5" class="tc">seal + lift + verify</text>
+<text x="717" y="733.5" class="tc">2.0 s</text>
+<text x="797" y="733.5" class="tc">vacuum + force</text>
+<path d="M 560 758 H 940" class="detail" stroke-width="0.7"/>
+<text x="567" y="752.5" class="tc">transfer + place</text>
+<text x="717" y="752.5" class="tc">2.6 s</text>
+<text x="797" y="752.5" class="tc">magazine interlock</text>
+<path d="M 560 777 H 940" class="detail" stroke-width="0.7"/>
+<text x="567" y="771.5" class="tc">per-hand cycle</text>
+<text x="717" y="771.5" class="tc">9–14 s</text>
+<text x="797" y="771.5" class="tc">bench G-B1</text>
+<path d="M 710 660 V 777" class="detail" stroke-width="0.7"/>
+<path d="M 790 660 V 777" class="detail" stroke-width="0.7"/>
+<text x="1060" y="500" class="note">1. Force limit is set in the hand MCU and cannot be raised by the task,</text>
+<text x="1060" y="516" class="note">   the engine or the fleet. The engine requests; the hand and the</text>
+<text x="1060" y="532" class="note">   safety controller decide.</text>
+<text x="1060" y="548" class="note">2. Seal loss or slip vents the cup and opens the hand. The egg is</text>
+<text x="1060" y="564" class="note">   flagged and abstained; the hand never squeezes harder or retries</text>
+<text x="1060" y="580" class="note">   blindly.</text>
+<text x="1060" y="596" class="note">3. Cracked, dirty or abnormal eggs go to the reject cradle with a</text>
+<text x="1060" y="612" class="note">   segregated record, never into a saleable tray.</text>
+<text x="1060" y="628" class="note">4. No shell washing, sanitising, coating or UV process exists on this</text>
+<text x="1060" y="644" class="note">   sheet or in the task grammar.</text>
+  <g transform="translate(1010,870)">
+    <rect x="0" y="0" width="545" height="135" class="border" fill="#f8fafb"/>
+    <path d="M 0 30 H 545 M 0 75 H 545 M 170 0 V 135 M 365 0 V 135" class="detail"/>
+    <text x="10" y="20" class="tbhead">PROJECT / DRAWING</text><text x="180" y="20" class="tbhead">REV</text><text x="375" y="20" class="tbhead">STATUS</text>
+    <text x="10" y="52" class="tb">AgriRobots / AGR-130</text><text x="180" y="52" class="tb">A · 09 OCT 2026</text><text x="375" y="52" class="tb">CONCEPT</text>
+    <text x="10" y="96" class="tbhead">TITLE</text><text x="10" y="115" class="tb">AR-01 ARM + HAND</text>
+    <text x="180" y="96" class="tbhead">UNITS</text><text x="180" y="115" class="tb">mm / kg / N / kPa as marked</text>
+    <text x="375" y="96" class="tbhead">RELEASE</text><text x="375" y="115" class="tb">NOT FOR FABRICATION</text>
+  </g>
+
+</svg>

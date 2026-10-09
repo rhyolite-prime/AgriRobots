@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <title>EG-08 ARACNID EIGHT-HAND EGG COLLECTION CASSETTE</title>
+  <desc>AgriRobots ARACNID engineering concept drawing. All dimensions millimetres unless noted.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto-start-reverse"><path d="M 0,0 L 9,4.5 L 0,9 z" class="dimfill"/></marker>
+    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e7ebef" stroke-width="0.7"/></pattern>
+    <style>
+      .border { fill:none; stroke:#18232e; stroke-width:2; }
+      .obj { fill:#edf3f5; stroke:#18232e; stroke-width:2.3; }
+      .dark { fill:#cbd9de; stroke:#18232e; stroke-width:2.3; }
+      .arm { fill:#dfe9ef; stroke:#18232e; stroke-width:2.4; }
+      .armline { fill:none; stroke:#18232e; stroke-width:6; stroke-linecap:round; }
+      .white { fill:#ffffff; stroke:#415661; stroke-width:1.5; }
+      .detail { fill:none; stroke:#415661; stroke-width:1.6; }
+      .hidden { fill:none; stroke:#71838d; stroke-width:1.3; stroke-dasharray:7 5; }
+      .center { fill:none; stroke:#3a94a8; stroke-width:1.1; stroke-dasharray:15 5 3 5; }
+      .dim { fill:none; stroke:#256f9b; stroke-width:1.25; marker-start:url(#arrow); marker-end:url(#arrow); }
+      .ext { fill:none; stroke:#256f9b; stroke-width:1; }
+      .lead { fill:none; stroke:#415661; stroke-width:1.1; }
+      .dimfill { fill:#256f9b; }
+      .datum { fill:#e8f4ed; stroke:#137a4a; stroke-width:1.5; }
+      .env { fill:none; stroke:#ac6d12; stroke-width:1.8; stroke-dasharray:8 5; }
+      .stop { fill:none; stroke:#a12626; stroke-width:2; }
+      .estop { fill:#fde7e7; stroke:#a12626; stroke-width:1.6; }
+      .label { font: 16px Arial, sans-serif; fill:#18232e; }
+      .small { font: 13px Arial, sans-serif; fill:#263842; }
+      .tiny { font: 11px Arial, sans-serif; fill:#263842; }
+      .note { font: 12.5px Arial, sans-serif; fill:#263842; }
+      .dimtxt { font: 14px Arial, sans-serif; font-weight:bold; fill:#256f9b; }
+      .view { font: bold 16px Arial, sans-serif; fill:#18232e; }
+      .title { font: bold 25px Arial, sans-serif; fill:#18232e; }
+      .tb { font: 12px Arial, sans-serif; fill:#18232e; }
+      .tbhead { font: bold 12px Arial, sans-serif; fill:#18232e; }
+      .th { font: bold 12px Arial, sans-serif; fill:#18232e; }
+      .tc { font: 11.5px Arial, sans-serif; fill:#263842; }
+    </style>
+  </defs>
+
+  <rect x="20" y="20" width="1560" height="1010" class="border"/>
+  <rect x="45" y="45" width="1510" height="960" fill="url(#grid)"/>
+  <text x="60" y="78" class="title">EG-08 ARACNID EIGHT-HAND EGG COLLECTION CASSETTE</text>
+  <text x="60" y="101" class="small">CONCEPT — NOT FOR FABRICATION · ALL DIMENSIONS IN mm · diagrammatic scale, verify with released CAD · X fwd, Y left, Z up</text>
+<text x="60" y="140" class="view">PLAN — stowed arms and magazine</text>
+<rect x="110" y="180" width="232" height="360" rx="6" class="datum"/>
+<circle cx="226" cy="360" r="92" class="white"/>
+<path d="M 226 300 L 226 242" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="226" cy="242" r="6" class="arm"/>
+<path d="M 268 318 L 309 277" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="309" cy="277" r="6" class="arm"/>
+<path d="M 286 360 L 344 360" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="344" cy="360" r="6" class="arm"/>
+<path d="M 268 402 L 309 443" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="309" cy="443" r="6" class="arm"/>
+<path d="M 226 420 L 226 478" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="226" cy="478" r="6" class="arm"/>
+<path d="M 184 402 L 143 443" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="143" cy="443" r="6" class="arm"/>
+<path d="M 166 360 L 108 360" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="108" cy="360" r="6" class="arm"/>
+<path d="M 184 318 L 143 277" stroke="#18232e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="143" cy="277" r="6" class="arm"/>
+<circle cx="226" cy="360" r="36" class="dark"/>
+<path d="M 286 360 L 346 336 L 525 296" class="hidden"/>
+<circle cx="525" cy="296" r="6" class="arm"/>
+<path d="M 519 445 A 248 248 0 0 0 445 170" class="env"/>
+<path d="M 110 554 V 586" class="ext"/><path d="M 342 554 V 586" class="ext"/><path d="M 110 570 H 342" class="dim"/><text x="226" y="557" class="dimtxt" text-anchor="middle">580</text>
+<path d="M 62 180 H 94" class="ext"/><path d="M 62 540 H 94" class="ext"/><path d="M 78 180 V 540" class="dim"/><text x="70" y="360" class="dimtxt" text-anchor="end" transform="rotate(-90 70 360)">900</text>
+<path d="M 226 292 L 366 210" class="lead"/><circle cx="226" cy="292" r="2.4" fill="#415661"/><text x="370" y="207" class="tiny" text-anchor="start">8 shoulders @45°</text>
+<path d="M 226 360 L 366 250" class="lead"/><circle cx="226" cy="360" r="2.4" fill="#415661"/><text x="370" y="247" class="tiny" text-anchor="start">magazine 6 × 30 trays</text>
+<path d="M 296 475 L 366 310" class="lead"/><circle cx="296" cy="475" r="2.4" fill="#415661"/><text x="370" y="307" class="tiny" text-anchor="start">pump + filters + MCU</text>
+<path d="M 525 296 L 548 250" class="lead"/><circle cx="525" cy="296" r="2.4" fill="#415661"/><text x="552" y="247" class="tiny" text-anchor="start">one deployed arm: 620 reach</text>
+<text x="520" y="470" class="view">SECTION A-A — column and magazine</text>
+<path d="M 460 800 H 760" class="detail"/>
+<rect x="480" y="790" width="240" height="10" class="dark"/>
+<rect x="570" y="589" width="60" height="201" class="obj"/>
+<rect x="520" y="623" width="160" height="102" class="white"/>
+<path d="M 528 628 H 672" class="detail" stroke-width="0.8"/>
+<path d="M 528 644 H 672" class="detail" stroke-width="0.8"/>
+<path d="M 528 660 H 672" class="detail" stroke-width="0.8"/>
+<path d="M 528 675 H 672" class="detail" stroke-width="0.8"/>
+<path d="M 528 691 H 672" class="detail" stroke-width="0.8"/>
+<path d="M 528 706 H 672" class="detail" stroke-width="0.8"/>
+<rect x="480" y="576" width="240" height="14" class="dark"/>
+<text x="600" y="820" text-anchor="middle" class="tiny">datum A · UCI clamps · connector</text>
+<path d="M 434 800 H 466" class="ext"/><path d="M 434 511 H 466" class="ext"/><path d="M 450 800 V 511" class="dim"/><text x="442" y="656" class="dimtxt" text-anchor="end" transform="rotate(-90 442 656)">850 STOWED</text>
+<path d="M 764 800 H 796" class="ext"/><path d="M 764 589 H 796" class="ext"/><path d="M 780 800 V 589" class="dim"/><text x="800" y="695" class="dimtxt" text-anchor="start" transform="rotate(-90 800 695)">620 RING</text>
+<path d="M 714 623 H 746" class="ext"/><path d="M 714 725 H 746" class="ext"/><path d="M 730 623 V 725" class="dim"/><text x="750" y="674" class="dimtxt" text-anchor="start" transform="rotate(-90 750 674)">MAGAZINE</text>
+<path d="M 718 582 L 800 562" class="lead"/><circle cx="718" cy="582" r="2.4" fill="#415661"/><text x="804" y="559" class="tiny" text-anchor="start">arm ring, 8 shoulders</text>
+<path d="M 520 674 L 440 654" class="lead"/><circle cx="520" cy="674" r="2.4" fill="#415661"/><text x="436" y="651" class="tiny" text-anchor="end">tilt-indexed tray magazine</text>
+<path d="M 670 780 L 800 759" class="lead"/><circle cx="670" cy="780" r="2.4" fill="#415661"/><text x="804" y="756" class="tiny" text-anchor="start">pump + vacuum manifold</text>
+<text x="980" y="140" class="view">TRAY + PER-EGG TRACEABILITY</text>
+<circle cx="1010" cy="175" r="8.5" class="white"/>
+<circle cx="1032" cy="175" r="8.5" class="white"/>
+<circle cx="1054" cy="175" r="8.5" class="white"/>
+<circle cx="1076" cy="175" r="8.5" class="white"/>
+<circle cx="1098" cy="175" r="8.5" class="white"/>
+<circle cx="1120" cy="175" r="8.5" class="white"/>
+<circle cx="1142" cy="175" r="8.5" class="white"/>
+<circle cx="1164" cy="175" r="8.5" class="white"/>
+<circle cx="1186" cy="175" r="8.5" class="white"/>
+<circle cx="1208" cy="175" r="8.5" class="white"/>
+<circle cx="1010" cy="197" r="8.5" class="white"/>
+<circle cx="1032" cy="197" r="8.5" class="white"/>
+<circle cx="1054" cy="197" r="8.5" class="white"/>
+<circle cx="1076" cy="197" r="8.5" class="white"/>
+<circle cx="1098" cy="197" r="8.5" class="white"/>
+<circle cx="1120" cy="197" r="8.5" class="white"/>
+<circle cx="1142" cy="197" r="8.5" class="white"/>
+<circle cx="1164" cy="197" r="8.5" class="white"/>
+<circle cx="1186" cy="197" r="8.5" class="white"/>
+<circle cx="1208" cy="197" r="8.5" class="white"/>
+<circle cx="1010" cy="219" r="8.5" class="white"/>
+<circle cx="1032" cy="219" r="8.5" class="white"/>
+<circle cx="1054" cy="219" r="8.5" class="white"/>
+<circle cx="1076" cy="219" r="8.5" class="white"/>
+<circle cx="1098" cy="219" r="8.5" class="white"/>
+<circle cx="1120" cy="219" r="8.5" class="white"/>
+<circle cx="1142" cy="219" r="8.5" class="white"/>
+<circle cx="1164" cy="219" r="8.5" class="white"/>
+<circle cx="1186" cy="219" r="8.5" class="white"/>
+<circle cx="1208" cy="219" r="8.5" class="white"/>
+<rect x="996" y="161" width="226" height="72" class="detail"/>
+<text x="1110" y="271" text-anchor="middle" class="tiny">30-egg flat · RFID/QR on tray</text>
+<rect x="980" y="300" width="350" height="174" class="border" fill="#f8fafb"/>
+<text x="987" y="315" class="th">FIELD</text>
+<text x="1137" y="315" class="th">SOURCE</text>
+<path d="M 980 322 H 1330" class="detail" stroke-width="1"/>
+<path d="M 980 341 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="335.5" class="tc">nest_id</text>
+<text x="1137" y="335.5" class="tc">route + nest map</text>
+<path d="M 980 360 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="354.5" class="tc">hand_id</text>
+<text x="1137" y="354.5" class="tc">H1…H8</text>
+<path d="M 980 379 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="373.5" class="tc">t_pick / t_place</text>
+<text x="1137" y="373.5" class="tc">engine clock (UTC sync)</text>
+<path d="M 980 398 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="392.5" class="tc">force_n / vacuum_kpa</text>
+<text x="1137" y="392.5" class="tc">hand sensor trace</text>
+<path d="M 980 417 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="411.5" class="tc">seal_quality</text>
+<text x="1137" y="411.5" class="tc">vacuum decay</text>
+<path d="M 980 436 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="430.5" class="tc">tray_id / slot</text>
+<text x="1137" y="430.5" class="tc">magazine index</text>
+<path d="M 980 455 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="449.5" class="tc">verdict</text>
+<text x="1137" y="449.5" class="tc">saleable / reject / abstained</text>
+<path d="M 980 474 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="468.5" class="tc">task_ir_hash</text>
+<text x="1137" y="468.5" class="tc">signed bundle</text>
+<path d="M 1130 300 V 474" class="detail" stroke-width="0.7"/>
+<rect x="980" y="500" width="350" height="79" class="border" fill="#f8fafb"/>
+<text x="987" y="515" class="th">CAPABILITY</text>
+<text x="1117" y="515" class="th">CLASS</text>
+<text x="1227" y="515" class="th">GATE</text>
+<path d="M 980 522 H 1330" class="detail" stroke-width="1"/>
+<path d="M 980 541 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="535.5" class="tc">scan_nest.v1</text>
+<text x="1117" y="535.5" class="tc">sensing_only</text>
+<text x="1227" y="535.5" class="tc">G2 (shadow)</text>
+<path d="M 980 560 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="554.5" class="tc">pick_egg.v1</text>
+<text x="1117" y="554.5" class="tc">conditional</text>
+<text x="1227" y="554.5" class="tc">G6 + approval</text>
+<path d="M 980 579 H 1330" class="detail" stroke-width="0.7"/>
+<text x="987" y="573.5" class="tc">place_egg.v1</text>
+<text x="1117" y="573.5" class="tc">conditional</text>
+<text x="1227" y="573.5" class="tc">G6 + approval</text>
+<path d="M 1110 500 V 579" class="detail" stroke-width="0.7"/>
+<path d="M 1220 500 V 579" class="detail" stroke-width="0.7"/>
+<text x="980" y="620" class="note">1. Collection and traceability only. Shell treatment is a separate</text>
+<text x="980" y="636" class="note">   validated process with its own owner and gate; it is absent from the</text>
+<text x="980" y="652" class="note">   grammar, the allow-list and the manifest.</text>
+<text x="980" y="668" class="note">2. Magazine may not index while any hand is inside the bay (SF-AR-10,</text>
+<text x="980" y="684" class="note">   compile-time and gate-time).</text>
+<text x="980" y="700" class="note">3. Trays, arm contact surfaces and the bay are wash-down to a contained</text>
+<text x="980" y="716" class="note">   path; food-contact materials require approved migration review</text>
+<text x="980" y="732" class="note">   before use with eggs.</text>
+<text x="980" y="748" class="note">4. Throughput is the measured number from G-B1 and the pilot, including</text>
+<text x="980" y="764" class="note">   abstentions and tray indexing — not the theoretical eight-hand rate.</text>
+  <g transform="translate(1010,870)">
+    <rect x="0" y="0" width="545" height="135" class="border" fill="#f8fafb"/>
+    <path d="M 0 30 H 545 M 0 75 H 545 M 170 0 V 135 M 365 0 V 135" class="detail"/>
+    <text x="10" y="20" class="tbhead">PROJECT / DRAWING</text><text x="180" y="20" class="tbhead">REV</text><text x="375" y="20" class="tbhead">STATUS</text>
+    <text x="10" y="52" class="tb">AgriRobots / AGR-210</text><text x="180" y="52" class="tb">A · 09 OCT 2026</text><text x="375" y="52" class="tb">CONCEPT</text>
+    <text x="10" y="96" class="tbhead">TITLE</text><text x="10" y="115" class="tb">EG-08 EGG CASSETTE</text>
+    <text x="180" y="96" class="tbhead">UNITS</text><text x="180" y="115" class="tb">mm / kg / N / kPa as marked</text>
+    <text x="375" y="96" class="tbhead">RELEASE</text><text x="375" y="115" class="tb">NOT FOR FABRICATION</text>
+  </g>
+
+</svg>

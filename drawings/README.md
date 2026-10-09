@@ -2,11 +2,15 @@
 
 **Drawing revision:** A · **Date:** 05 October 2026
 **Status:** Every sheet is a vector **concept drawing / NOT FOR FABRICATION**. All dimensions are in millimetres unless marked. SVGs retain clean vector lines and may be reviewed in a browser or CAD/vector tool.
+**ARACNID set (AGR-120/130/210):** added 09 October 2026 with the [AR-01/EG-08 design basis](../docs/10_ARACNID_AR01_DESIGN_BASIS.md); the AR-01 carrier and EG-08 cassette share the UCI-01 contract with the cassettes above.
 
 | Drawing | File | Purpose |
 | --- | --- | --- |
 | AGR-100 | [AP-01 carrier general arrangement](AGR-100_AP01_CARRIER_GA.svg) | Carrier top/side envelope, wheels, deck, mast and coordinate convention |
 | AGR-110 | [UCI-01 universal cassette interface](AGR-110_UCI01_PAYLOAD_INTERFACE.svg) | Cassette footprint, support/latch centres, locator concept and interface section |
+| AGR-120 | [AR-01 ARACNID carrier general arrangement](AGR-120_AR01_CARRIER_GA.svg) | ARACNID rover: plan/side/front with deployed envelope, cassette-bay detail, stability and safety notes |
+| AGR-130 | [AR-01 picking arm and compliant suction hand](AGR-130_AR01_ARM_AND_HAND.svg) | 3-DOF arm elevation, joint ranges and speeds, suction-hand section with force limit |
+| AGR-210 | [EG-08 ARACNID egg collection cassette](AGR-210_EG08_ARACNID_EGG_MODULE.svg) | Eight-hand ring and magazine section, tray layout and per-egg traceability fields |
 | AGR-200 | [EG-01 egg collection cassette](AGR-200_EG01_EGG_MODULE.svg) | Envelope, stowed arm/pick reach, trays and process hold points |
 | AGR-300 | [FD-01 dry feed cassette](AGR-300_FD01_FEED_MODULE.svg) | Hopper/metre/chute arrangement and dimensional envelope |
 | AGR-350 | [CS-01 cleaning/sanitation cassette](AGR-350_CS01_CLEAN_SANITATION_MODULE.svg) | Tank/pump/tool concept, segregation and envelope |

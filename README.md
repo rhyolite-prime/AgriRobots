@@ -11,6 +11,16 @@ The carrier deliberately has a fixed protected mobility/safety/compute stack. Ea
 
 ![AP-01 carrier general arrangement](drawings/AGR-100_AP01_CARRIER_GA.svg)
 
+**ARACNID — the first robot to be built.** AR-01 is an eight-hand rover carrier
+(4 independent drive/steer modules, 165 kg payload rating) carrying the EG-08
+egg-collection cassette on the same UCI-01 contract: eight 3-DOF picking arms
+with compliant suction hands around a tilt-indexed 6×30-egg magazine. Its
+design basis, safety functions and build gates live in
+[docs/10](docs/10_ARACNID_AR01_DESIGN_BASIS.md); the sheets are
+[AGR-120](drawings/AGR-120_AR01_CARRIER_GA.svg),
+[AGR-130](drawings/AGR-130_AR01_ARM_AND_HAND.svg) and
+[AGR-210](drawings/AGR-210_EG08_ARACNID_EGG_MODULE.svg).
+
 ## Design package
 
 | Artifact | What it answers |
@@ -21,6 +31,7 @@ The carrier deliberately has a fixed protected mobility/safety/compute stack. Ea
 | [AgriScript DSL artifacts](dsl/README.md) | Draft JSON Schema plus feed, egg, sanitation, and conservative-weeding recipe examples |
 | [AgriScript grammar](dsl/grammar/README.md) | Formal `agri.task/v1` BNF, safety properties enforced by syntax, and grammar ↔ YAML ↔ engine mapping |
 | [DSL and execution engine design](docs/09_DSL_AND_EXECUTION_ENGINE.md) | Engine derived from the grammar: parser, validator, IR, interpreter, safety gate, checkpoints, `agric` CLI, conformance plan |
+| [ARACNID AR-01/EG-08 design basis](docs/10_ARACNID_AR01_DESIGN_BASIS.md) | First build: eight-hand rover carrier, egg cassette, stability case, safety functions and build gates |
 | [Execution plan and verification](docs/03_EXECUTION_PLAN_AND_VV.md) | 52-week staged plan, gates, pilot acceptance tests, risk register |
 | [Implementation plan](docs/08_IMPLEMENTATION_PLAN.md) | White-paper-to-build roadmap for the Virtual Lab, simulation/AI, AgriScript, edge runtime, hardware, and fleet workstreams |
 | [Preliminary BOM and make/buy plan](docs/04_PRELIMINARY_BOM.md) | Costed work packages and procurement-critical items |
