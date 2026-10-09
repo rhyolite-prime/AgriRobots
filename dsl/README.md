@@ -43,6 +43,7 @@ A recipe must be signed after validation. At runtime, the executor verifies the 
 | [`examples/guarded-early-weeding.yaml`](examples/guarded-early-weeding.yaml) | Crop-protective actuation gate and abstention action |
 | [`examples/poultry-evening-feed.agri`](examples/poultry-evening-feed.agri) | Textual `agri.task/v1` twin of the feed recipe |
 | [`examples/guarded-early-weeding.agri`](examples/guarded-early-weeding.agri) | Textual twin exercising `observe`/`abstain_if`, `guard`, `with_permit`, `degrade_to` |
+| [`examples/aracnid-egg-collection.agri`](examples/aracnid-egg-collection.agri) | ARACNID reference task: resource instances (`tool[hand_1]`…), permit scopes, bounded parallel picks, serialised magazine placement |
 
 ## Implementation work package
 

@@ -14,7 +14,7 @@ registry and the safety case.
 The engine design follows the grammar, not the other way round: every production
 names a statement class, every statement class names a runtime behaviour, and
 every refusal the engine can make is traceable to a production or a numbered
-semantic rule (`S1`–`S10`) in the grammar file.
+semantic rule (`S1`–`S11`) in the grammar file.
 
 ## Lineage
 
@@ -43,7 +43,7 @@ What a physical machine forces to change:
 | `command http.post` | No network, filesystem or raw-actuator production |
 | Failure ends a session | Failure must reach `on_fault`, which is a required clause |
 | State is a JSON context | State roots are a closed, read-only list with staleness bounds |
-| Concurrency is a throughput feature | `parallel` branches declare a `resource-class`; exclusive resources are arbitrated |
+| Concurrency is a throughput feature | `parallel` branches declare a `<resource-spec>` (class or instance, e.g. `tool[hand_3]`); exclusive claims are arbitrated statically (S11) and at run time |
 | — | `with_permit` / `request_permit`: hazardous energy is requested, never granted by the task |
 | — | `guard … @ within … every …`: a continuous invariant over a whole block |
 
@@ -75,7 +75,7 @@ One task, three serialisations, one compiled artifact:
 
 ```text
 .agri text  ─┐
-             ├─► AST (grammar productions) ─► semantic checks S1–S10
+             ├─► AST (grammar productions) ─► semantic checks S1–S11
 agri.script/v1 YAML ─┘                              │
                                                     ▼
                                   agri.bt-ir/v0 — canonical, byte-stable,
@@ -117,7 +117,8 @@ below and covered by a golden test.
 | `for_each $x in … at_most N` | `for_each` + `maximum_iterations` | `LoopFrame` |
 | `repeat N times` | not present in YAML v1 | `LoopFrame` |
 | `when … otherwise …` | `when` | `BranchFrame` |
-| `parallel { branch <resource> … } join` | not present in YAML v1 | `ParallelFrame` |
+| `parallel { branch <resource-spec> … } join` | not present in YAML v1 | `ParallelFrame` + resource arbitrator |
+| `actuate … using <resource-spec>` / `with_permit … on <resource-spec>` | not present in YAML v1 | extra claim / permit lease scope |
 | `record <event> { … }` | `record` | `JournalStatement` |
 | `safe_stop` / `park_tool` / `degrade_to` / `notify` | `safe_stop`, `park_tool`, `notify` | `SafetyRequestStatement` |
 | `run_task … depth_at_most N` | not present in YAML v1 | `SubtaskStatement` |

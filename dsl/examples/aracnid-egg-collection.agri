@@ -1,0 +1,212 @@
+// Grammar conformance example for agri.task/v1 — the ARACNID reference task.
+// One supervised egg-collection round with EG-08 on the AR-01 carrier
+// (docs/10, drawings AGR-120/130/210). It exercises the ARACNID grammar
+// extensions: resource instances in `parallel` branches and permit scopes
+// (`tool[hand_1]` … `tool[hand_8]`, `tool[magazine]`), per-hand verification,
+// bounded fan-out, and a single fault path that vents vacuum and holds arms.
+// Hashes are placeholders, not real model or calibration data.
+//
+// pick_egg.v1 and place_egg.v1 are conditional_task at G6 with process
+// approval: this task is a bench, simulation and supervised-pilot artifact.
+// It is not permission to operate on a farm.
+
+meta {
+  owner "livestock-systems";
+  change_ticket "AGR-ARAC-004";
+  description "ARACNID eight-hand collection round: scan, parallel picks, serialised placement.";
+  tags "aracnid", "egg_collection", "supervised";
+}
+
+task aracnid-egg-collection@1.0.0 {
+  requires {
+    cassette EG-08 with scan_nest.v1, pick_egg.v1, place_egg.v1;
+    operator supervisor_on_site;
+    zones lay-house-3, egg-room;
+    map lay-house-survey-2026@1.1.0;
+    route lay-house-3 commissioned;
+    calibration sha256:b4b632b99fff2c8f1f0449da1dafa94d79ab5d6a92ecc477c9540cc5a12751c9;
+    process_approval EGG-08-001;
+  }
+
+  limits {
+    travel_speed     = 0.15 m/s;   // arms-out cap from docs/10 section 3
+    task_deadline    = 40 min;
+    max_retries      = 1 count;
+    tool_timeout     = 20 s;
+    dock_tolerance   = 10 mm;
+    max_force        = 6 N;        // set point; the hand MCU hard limit is 12 N
+    max_pressure     = 25 kPa;
+    exclusion_radius = 1300 mm;    // deployed envelope is an exclusion zone
+  }
+
+  preflight {
+    cassette.id == "EG-08"                    @ within 1 s;
+    cassette.latch == #LOCKED                 @ within 500 ms;
+    cassette.manifest_payload_kg <= 165 kg    @ within 2 s;
+    carrier.parked == true                    @ within 500 ms;
+    carrier.tilt < 3 deg                      @ within 200 ms;
+    safety.arm_envelope_clear == true         @ within 200 ms;
+    battery.charge > 35 %                     @ within 30 s;
+    operator.present == true                  @ within 2 s;
+  }
+
+  steps {
+    approach: move along lay-house-3 at 0.15 m/s within 12 min;
+    stand:    dock at nest-bank-3 tolerance 10 mm within 90 s;
+
+    // One passive scan of the whole bank; abstention ends the round quietly.
+    scan: observe scan_nest.v1 (
+            bank = #nest_bank_3,
+            min_confidence = 0.80 ratio
+          )
+          into $nest
+          within 5 s
+          abstain_if $nest.confidence < 0.80;
+
+    when $nest.abstained == true @ within 1 s {
+      note_abstain: notify supervisor severity medium
+        "nest scan abstained; round ends without picking";
+      finish aborted message = "low-confidence nest scan";
+    }
+
+    // Picks run concurrently, one exclusive hand instance per branch (S11).
+    // Traction is not claimed anywhere in this block: EG-08 declares
+    // motion_during_tool_use = false, so the carrier stays parked and braked.
+    guard carrier.tilt < 4 deg @ within 200 ms every 500 ms {
+      picks: parallel {
+        h1: branch tool[hand_1] {
+          with_permit tool_energy on tool[hand_1] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_1, slot = $nest.slot_1)
+              within 8 s
+              verify {
+                tool.hand_1.seal_quality == #good @ within 500 ms;
+                tool.hand_1.load_mass > 40 g      @ within 1 s;
+                tool.hand_1.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h2: branch tool[hand_2] {
+          with_permit tool_energy on tool[hand_2] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_2, slot = $nest.slot_2)
+              within 8 s
+              verify {
+                tool.hand_2.seal_quality == #good @ within 500 ms;
+                tool.hand_2.load_mass > 40 g      @ within 1 s;
+                tool.hand_2.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h3: branch tool[hand_3] {
+          with_permit tool_energy on tool[hand_3] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_3, slot = $nest.slot_3)
+              within 8 s
+              verify {
+                tool.hand_3.seal_quality == #good @ within 500 ms;
+                tool.hand_3.load_mass > 40 g      @ within 1 s;
+                tool.hand_3.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h4: branch tool[hand_4] {
+          with_permit tool_energy on tool[hand_4] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_4, slot = $nest.slot_4)
+              within 8 s
+              verify {
+                tool.hand_4.seal_quality == #good @ within 500 ms;
+                tool.hand_4.load_mass > 40 g      @ within 1 s;
+                tool.hand_4.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h5: branch tool[hand_5] {
+          with_permit tool_energy on tool[hand_5] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_5, slot = $nest.slot_5)
+              within 8 s
+              verify {
+                tool.hand_5.seal_quality == #good @ within 500 ms;
+                tool.hand_5.load_mass > 40 g      @ within 1 s;
+                tool.hand_5.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h6: branch tool[hand_6] {
+          with_permit tool_energy on tool[hand_6] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_6, slot = $nest.slot_6)
+              within 8 s
+              verify {
+                tool.hand_6.seal_quality == #good @ within 500 ms;
+                tool.hand_6.load_mass > 40 g      @ within 1 s;
+                tool.hand_6.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h7: branch tool[hand_7] {
+          with_permit tool_energy on tool[hand_7] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_7, slot = $nest.slot_7)
+              within 8 s
+              verify {
+                tool.hand_7.seal_quality == #good @ within 500 ms;
+                tool.hand_7.load_mass > 40 g      @ within 1 s;
+                tool.hand_7.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+        h8: branch tool[hand_8] {
+          with_permit tool_energy on tool[hand_8] for 30 s {
+            actuate pick_egg.v1 (hand = #hand_8, slot = $nest.slot_8)
+              within 8 s
+              verify {
+                tool.hand_8.seal_quality == #good @ within 500 ms;
+                tool.hand_8.load_mass > 40 g      @ within 1 s;
+                tool.hand_8.force_peak <= 12 N    @ within 1 s;
+              }
+              on_mismatch fault;
+          }
+        }
+      } join quorum(6);
+    } on_breach fault;
+
+    // Placement is serialised: each transfer claims its hand and the magazine
+    // together, so the tray never indexes under a second hand (SF-AR-10).
+    place: for_each $held in tool.holding_hands @ within 1 s at_most 8 {
+      actuate place_egg.v1 (hand = $held, tray = #next_saleable)
+        using tool[magazine]
+        within 10 s
+        verify {
+          cassette.magazine.slot_confirmed == true @ within 1 s;
+          tool[$held].load_mass == 0 g @ within 1 s;
+        }
+        on_mismatch retry at_most 1 times backoff 2 s
+          idempotency_key $held.transfer_key;
+    } on_exhausted fault;
+
+    tally: record egg_round.completed {
+      picked = count_of($nest.slots_offered),
+      stowed = count_of(tool.holding_hands),
+      abstained = $nest.abstained,
+    };
+
+    finish success message = "ARACNID round complete; trays indexed and verified";
+  }
+
+  on_fault {
+    vent: safe_stop reason = "ARACNID fault: vacuum vented, arms held, traction inhibited";
+    park_tool;
+    notify stockperson severity high
+      "egg round aborted; check reject cradle and magazine before re-arm";
+    finish failed EGGS_ROUND_ABORTED message = "see journal and safety_events";
+  }
+
+  evidence {
+    retain perception_records, tool_trace, safety_events, journal;
+    privacy animal_records;
+    retention_days 365;
+  }
+}

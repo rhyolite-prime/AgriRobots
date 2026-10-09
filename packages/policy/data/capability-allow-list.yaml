@@ -15,7 +15,7 @@
 # docs/03_EXECUTION_PLAN_AND_VV.md gates G5-G7 and dsl/examples/*.yaml.
 
 schemaVersion: agri.policy.capability-allow-list/v1
-revision: 0.1.0
+revision: 0.2.0
 status: draft
 
 capabilities:
@@ -48,6 +48,37 @@ capabilities:
       Egg picking, placement and traceability only. Requires end-effector force,
       crack-rate, materials, animal-welfare and food-safety review. Shell
       treatment is a separate capability that does not exist in this list.
+
+  - id: scan_nest.v1
+    cassetteType: egg_collection
+    hazardClass: sensing_only
+    minimumGate: G2
+    processApprovalRequired: false
+    description: >-
+      Passive nest-bank perception for ARACNID: egg candidates, confidence,
+      occlusion and animal-presence flags with calibration and abstention
+      reporting. Shadow-mode only; it may not command an arm.
+
+  - id: pick_egg.v1
+    cassetteType: egg_collection
+    hazardClass: conditional_task
+    minimumGate: G6
+    processApprovalRequired: true
+    description: >-
+      One compliant-suction pick by one named hand of EG-08, under the hand's
+      hard 12 N force limit with vacuum-decay slip detection. Collection and
+      traceability only; a failed seal abstains and never re-squeezes.
+
+  - id: place_egg.v1
+    cassetteType: egg_collection
+    hazardClass: conditional_task
+    minimumGate: G6
+    processApprovalRequired: true
+    description: >-
+      Transfer of a held egg into an indexed magazine tray slot (or the reject
+      cradle) with slot verification. Claims the hand instance and, while the
+      tray indexes, tool[magazine]; the magazine interlock SF-AR-10 is
+      enforced compile-time and gate-time.
 
   - id: inspect_plant.v1
     cassetteType: weeding

@@ -43,6 +43,16 @@ export interface ManifestLimits {
   requires_operator_present: boolean;
 }
 
+/** What the host carrier must provide before this cassette may be latched and
+ * energised; checked against the carrier's released rating at manifest load. */
+export interface ManifestCarrierRequirements {
+  carrier_id?: string;
+  min_payload_rating_kg: number;
+  max_stowed_height_mm?: number;
+  requires_uci?: string;
+  motion_during_tool_use?: boolean;
+}
+
 export interface ModuleManifest {
   schema: typeof MODULE_MANIFEST_SCHEMA;
   module_id: string;
@@ -53,6 +63,7 @@ export interface ModuleManifest {
   power: ManifestPower;
   capabilities: string[];
   limits: ManifestLimits;
+  carrier_requirements?: ManifestCarrierRequirements;
   calibration_bundle: string;
   signature: string;
 }
@@ -86,7 +97,7 @@ export function validateModuleManifest(input: unknown): ManifestValidationResult
     errors.push(`schema: expected "${MODULE_MANIFEST_SCHEMA}"`);
   }
   if (!isModuleSerial(input['module_id'])) {
-    errors.push('module_id: expected "<EG|FD|CS|WD>-01-<4 digits>"');
+    errors.push('module_id: expected "<cassette-id>-<4 digits>", e.g. EG-08-0001');
   }
   if (!isCassetteType(input['type'])) {
     errors.push('type: expected one of egg_collection, feed, cleaning_sanitation, weeding');
@@ -100,8 +111,49 @@ export function validateModuleManifest(input: unknown): ManifestValidationResult
 
   const serial = typeof input['module_id'] === 'string' ? input['module_id'] : '';
   const type = typeof input['type'] === 'string' ? input['type'] : '';
-  if (serial.length > 0 && type.length > 0 && !serial.startsWith(typePrefixOf(type))) {
+  if (
+    serial.length > 0 &&
+    type.length > 0 &&
+    !typePrefixesOf(type).some((prefix) => serial.startsWith(prefix))
+  ) {
     errors.push(`module_id: prefix does not match cassette type "${type}"`);
+  }
+
+  const carrierRequirements = input['carrier_requirements'];
+  if (carrierRequirements !== undefined) {
+    if (!isRecord(carrierRequirements)) {
+      errors.push('carrier_requirements: expected an object');
+    } else {
+      if (
+        !isFiniteNumber(carrierRequirements['min_payload_rating_kg']) ||
+        carrierRequirements['min_payload_rating_kg'] < 0
+      ) {
+        errors.push(
+          'carrier_requirements.min_payload_rating_kg: expected a non-negative number of kilograms',
+        );
+      }
+      if (
+        carrierRequirements['max_stowed_height_mm'] !== undefined &&
+        (!isFiniteNumber(carrierRequirements['max_stowed_height_mm']) ||
+          carrierRequirements['max_stowed_height_mm'] < 0)
+      ) {
+        errors.push('carrier_requirements.max_stowed_height_mm: expected a non-negative number');
+      }
+      for (const key of ['carrier_id', 'requires_uci'] as const) {
+        if (
+          carrierRequirements[key] !== undefined &&
+          typeof carrierRequirements[key] !== 'string'
+        ) {
+          errors.push(`carrier_requirements.${key}: expected a string`);
+        }
+      }
+      if (
+        carrierRequirements['motion_during_tool_use'] !== undefined &&
+        typeof carrierRequirements['motion_during_tool_use'] !== 'boolean'
+      ) {
+        errors.push('carrier_requirements.motion_during_tool_use: expected a boolean');
+      }
+    }
   }
 
   const cg = input['cg_mm'];
@@ -175,18 +227,20 @@ export function validateModuleManifest(input: unknown): ManifestValidationResult
   return { valid: true, errors: [], manifest: input as unknown as ModuleManifest };
 }
 
-function typePrefixOf(type: string): string {
+/** Accepted module_id prefixes per cassette type. `egg_collection` has two
+ * cassettes on the same UCI-01 contract: EG-01 and the ARACNID EG-08. */
+function typePrefixesOf(type: string): string[] {
   switch (type) {
     case 'egg_collection':
-      return 'EG-01';
+      return ['EG-01', 'EG-08'];
     case 'feed':
-      return 'FD-01';
+      return ['FD-01'];
     case 'cleaning_sanitation':
-      return 'CS-01';
+      return ['CS-01'];
     case 'weeding':
-      return 'WD-01';
+      return ['WD-01'];
     default:
-      return '';
+      return [];
   }
 }
 

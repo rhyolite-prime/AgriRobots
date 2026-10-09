@@ -2,7 +2,7 @@
 
 **Document:** AGR-ARB-100 · **Revision:** A · **Status:** concept design basis / NOT FOR FABRICATION  
 **Drawings:** [`AGR-120`](../drawings/AGR-120_AR01_CARRIER_GA.svg) · [`AGR-130`](../drawings/AGR-130_AR01_ARM_AND_HAND.svg) · [`AGR-210`](../drawings/AGR-210_EG08_ARACNID_EGG_MODULE.svg)  
-**Task language:** `dsl/examples/aracnid-egg-collection.agri` (lands with the execution engine) on [`agri.task/v1`](../dsl/grammar/agri.task.v1.bnf)  
+**Task language:** [`dsl/examples/aracnid-egg-collection.agri`](../dsl/examples/aracnid-egg-collection.agri) on [`agri.task/v1`](../dsl/grammar/agri.task.v1.bnf)  
 **Parent documents:** [`00_DESIGN_BASIS.md`](00_DESIGN_BASIS.md), [`01_MECHANICAL_DESIGN.md`](01_MECHANICAL_DESIGN.md), [`05_SAFETY_AND_COMPLIANCE.md`](05_SAFETY_AND_COMPLIANCE.md), [`09_DSL_AND_EXECUTION_ENGINE.md`](09_DSL_AND_EXECUTION_ENGINE.md)
 
 ## 1. What ARACNID is
@@ -167,7 +167,7 @@ ARACNID drove three grammar changes, all recorded in
    cannot spin the loop.
 
 The reference task is
-`dsl/examples/aracnid-egg-collection.agri` (lands with the execution engine):
+[`dsl/examples/aracnid-egg-collection.agri`](../dsl/examples/aracnid-egg-collection.agri):
 scan the nest bank, dispatch up to eight hands in parallel with per-hand
 verification, index the magazine under an exclusive resource, abstain on low
 confidence, and unwind through one `on_fault` clause that vents vacuum, holds

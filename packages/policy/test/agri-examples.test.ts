@@ -23,6 +23,7 @@ interface AgriRequires {
 /** Cassette id -> `agri.module/v1` type, mirroring @agrirobots/domain-model. */
 const TYPE_BY_CASSETTE: Record<string, string> = {
   'EG-01': 'egg_collection',
+  'EG-08': 'egg_collection',
   'FD-01': 'feed',
   'CS-01': 'cleaning_sanitation',
   'WD-01': 'weeding',
@@ -42,7 +43,7 @@ function readRequires(): AgriRequires[] {
     .map((name) => {
       const text = stripComments(readFileSync(path.join(EXAMPLES_DIR, name), 'utf8'));
 
-      const cassette = /cassette\s+(EG-01|FD-01|CS-01|WD-01)\s+with\s+([^;]+);/.exec(text);
+      const cassette = /cassette\s+(EG-01|EG-08|FD-01|CS-01|WD-01)\s+with\s+([^;]+);/.exec(text);
       const operator = /operator\s+([a-z_]+)\s*;/.exec(text);
       const zones = /zones\s+([^;]+);/.exec(text);
 

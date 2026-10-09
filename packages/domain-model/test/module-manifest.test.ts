@@ -34,6 +34,33 @@ describe('agri.module/v1 manifest validation', () => {
     expect(result.manifest?.module_id).toBe('WD-01-0042');
   });
 
+  it('accepts an ARACNID EG-08 manifest with carrier requirements', () => {
+    const result = validateModuleManifest({
+      ...validManifest,
+      module_id: 'EG-08-0001',
+      type: 'egg_collection',
+      capabilities: ['scan_nest.v1', 'pick_egg.v1', 'place_egg.v1'],
+      carrier_requirements: {
+        carrier_id: 'AR-01',
+        min_payload_rating_kg: 135,
+        max_stowed_height_mm: 850,
+        requires_uci: 'UCI-01',
+        motion_during_tool_use: false,
+      },
+    });
+    expect(result.errors).toEqual([]);
+    expect(result.valid).toBe(true);
+  });
+
+  it('rejects carrier requirements without a payload rating', () => {
+    const result = validateModuleManifest({
+      ...validManifest,
+      carrier_requirements: { carrier_id: 'AR-01' },
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.join('\n')).toContain('min_payload_rating_kg');
+  });
+
   it('rejects a non-object payload', () => {
     expect(validateModuleManifest('WD-01-0042').valid).toBe(false);
     expect(validateModuleManifest(null).valid).toBe(false);

@@ -58,6 +58,13 @@
 ;;   S10 Determinism: no wall-clock read, no random, no unbounded recursion.
 ;;       Time comes from the injected engine clock; retry is explicit and
 ;;       bounded and requires an idempotency key on physical actions.
+;;   S11 Resource claims are arbitrated. Two branches of one <parallel-stmt>
+;;       may not claim the same <resource-spec>; a static double claim is a
+;;       compile-time error. A claim whose instance is a <variable> is checked
+;;       at run time by the arbitrator, and a denial is inhibiting (the branch
+;;       waits or faults; it never silently shares an exclusive resource).
+;;       `traction` may not overlap any `tool[...]` claim unless the cassette
+;;       manifest approves motion during tool use.
 ;;
 ;; ===========================================================================
 ;; 1. Document structure
@@ -156,6 +163,7 @@
 ;; by the world, not by the action's own return value.
 
 <actuate-stmt>      ::= "actuate" <capability-id> <arg-list>
+                        [ "using" <resource-spec> ]
                         "within" <duration>
                         "verify" "{" <postcondition>+ "}"
                         [ "on_mismatch" ( "fault" | "retry" <retry-spec> ) ]
@@ -188,8 +196,10 @@
 
 ;; --- 2.5 Safety permission (request only; granting is not expressible) ----
 
-<permit-stmt>       ::= "with_permit" <permit-kind> [ "for" <duration> ] <block>
-                      | "request_permit" <permit-kind> [ "for" <duration> ]
+<permit-stmt>       ::= "with_permit" <permit-kind> [ "on" <resource-spec> ]
+                        [ "for" <duration> ] <block>
+                      | "request_permit" <permit-kind> [ "on" <resource-spec> ]
+                        [ "for" <duration> ]
                         [ "on_denied" ( "fault" | <stmt-id> ) ]
 <permit-kind>       ::= "tool_energy" | "auto_task" | "auto_travel"
                       | "service" | "fluid_line" | "guarded_plot_entry"
@@ -214,8 +224,15 @@
 <when-stmt>         ::= "when" <condition> [ <freshness> ] <block>
                         [ "otherwise" <block> ]
 <parallel-stmt>     ::= "parallel" "{" <branch>+ "}" "join" <join-policy>
-<branch>            ::= [ <stmt-id> ":" ] "branch" <resource-class> <block>
+<branch>            ::= [ <stmt-id> ":" ] "branch" <resource-spec> <block>
 <join-policy>       ::= "all" | "first_success" | "quorum" "(" <integer> ")"
+
+;; A <resource-spec> names either a whole class (exclusive classes are then
+;; claimed in full) or one instance of it. Instances make concurrent hands
+;; expressible and statically checkable: `tool[hand_1]` and `tool[hand_2]`
+;; may run in parallel, two claims of `tool[hand_1]` may not (S11).
+<resource-spec>     ::= <resource-class> [ "[" <resource-instance> "]" ]
+<resource-instance> ::= <identifier> | <variable>
 <resource-class>    ::= "sensing" | "logging" | "communication" | "tool"
                       | "traction" | "fluid"
 <sequence-stmt>     ::= "sequence" <block>
@@ -353,7 +370,7 @@
 <version>           ::= <digit>+ "." <digit>+ "." <digit>+
 
 <capability-id>     ::= <identifier> "." "v" <digit>+
-<cassette-id>       ::= "EG-01" | "FD-01" | "CS-01" | "WD-01"
+<cassette-id>       ::= "EG-01" | "EG-08" | "FD-01" | "CS-01" | "WD-01"
 <zone-id>           ::= <lower-alnum> { <lower-alnum> | "-" }      ;; 2..63 chars
 <route-ref>         ::= <zone-id>
 <station-ref>       ::= <zone-id>

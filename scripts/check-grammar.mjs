@@ -264,6 +264,9 @@ const ACTION_TO_GRAMMAR = {
 /** Sensing capabilities whose base name is not an ALLOWED_ACTIONS entry. */
 const CAPABILITY_TO_STATEMENT = {
   inspect_plant: 'observe',
+  scan_nest: 'observe',
+  pick_egg: 'actuate',
+  place_egg: 'actuate',
 };
 
 function extractAllowedActions(sourceText) {
