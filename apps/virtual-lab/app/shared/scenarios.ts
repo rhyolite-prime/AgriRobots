@@ -12,7 +12,8 @@ export const ARACNID_SCENARIOS: readonly LabScenario[] = [
     id: 'nominal',
     label: 'Nominal round',
     description: 'Sixteen eggs in the bank, eight saleable offers, magazine with room, no faults.',
-    expects: 'Completes with exit 0: eight picks in parallel, quorum 6 satisfied, eight placed and trays verified.',
+    expects:
+      'Completes with exit 0: eight picks in parallel, quorum 6 satisfied, eight placed and trays verified.',
   },
   {
     id: 'low-confidence',
@@ -24,7 +25,8 @@ export const ARACNID_SCENARIOS: readonly LabScenario[] = [
     id: 'seal-loss',
     label: 'Seal loss (SF-AR-04)',
     description: 'One cup loses vacuum during the lift; the egg is vented back into the nest.',
-    expects: 'One branch fails its post-conditions, the quorum still holds and the round completes with seven eggs.',
+    expects:
+      'One branch fails its post-conditions, the quorum still holds and the round completes with seven eggs.',
   },
   {
     id: 'cracked-egg',
@@ -41,20 +43,24 @@ export const ARACNID_SCENARIOS: readonly LabScenario[] = [
   {
     id: 'tilt-breach',
     label: 'Tilt guard breach',
-    description: 'Carrier tilt rises to 4.6 deg: past the task guard of 4 deg, under the 6 deg tip-over trip.',
-    expects: 'The guard breaches first (defence in depth), the fault clause holds the arms and the exit code is 4.',
+    description:
+      'Carrier tilt rises to 4.6 deg: past the task guard of 4 deg, under the 6 deg tip-over trip.',
+    expects:
+      'The guard breaches first (defence in depth), the fault clause holds the arms and the exit code is 4.',
   },
   {
     id: 'magazine-full',
     label: 'Magazine full',
     description: 'All six trays are already full when placement starts.',
-    expects: 'Placement is retried exactly once (max_retries = 1), then the round faults operationally with exit 1.',
+    expects:
+      'Placement is retried exactly once (max_retries = 1), then the round faults operationally with exit 1.',
   },
   {
     id: 'fewer-eggs-than-hands',
     label: 'Fewer eggs than hands',
     description: 'Five eggs in the bank for eight hands.',
-    expects: 'Hands with nothing to take abstain; abstentions never satisfy the quorum, so the round faults.',
+    expects:
+      'Hands with nothing to take abstain; abstentions never satisfy the quorum, so the round faults.',
   },
 ] as const;
 
@@ -68,8 +74,16 @@ export const ARACNID_FAULT_KINDS: readonly LabFaultKind[] = [
 ] as const;
 
 export const NEST_LAYOUTS = [
-  { id: 'arc', label: 'Perimeter arc', note: 'nest bank wraps the docked rover; all eight shoulders reach' },
-  { id: 'straight', label: 'Straight run', note: 'one 1.2 m run; only the hands nearest it can work' },
+  {
+    id: 'arc',
+    label: 'Perimeter arc',
+    note: 'nest bank wraps the docked rover; all eight shoulders reach',
+  },
+  {
+    id: 'straight',
+    label: 'Straight run',
+    note: 'one 1.2 m run; only the hands nearest it can work',
+  },
 ] as const;
 
 export function scenarioById(id: string | undefined): LabScenario | undefined {

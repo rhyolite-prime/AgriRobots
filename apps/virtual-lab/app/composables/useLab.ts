@@ -1,4 +1,4 @@
-import { computed, markRaw, ref, shallowRef, type Reactive } from 'vue';
+import { computed, markRaw, ref, shallowRef, watch, type Reactive } from 'vue';
 
 import type {
   ApiError,
@@ -9,8 +9,9 @@ import type {
   LabTaskSummary,
   RunRequest,
   RunResponse,
-} from '../../shared/lab-types';
-import { ARACNID_FAULT_KINDS, ARACNID_SCENARIOS, NEST_LAYOUTS } from '../../shared/scenarios';
+  TaskResponse,
+} from '../shared/lab-types';
+import { ARACNID_FAULT_KINDS, ARACNID_SCENARIOS, NEST_LAYOUTS } from '../shared/scenarios';
 
 export interface ShelfEntry {
   task: LabTaskSummary;
@@ -54,6 +55,9 @@ export function useLab() {
   const preflight = ref(true);
 
   const run = shallowRef<RunResponse | null>(null);
+  /** Which task the stored run belongs to, so panels do not mix two tasks. */
+  const runTaskId = ref<string | null>(null);
+  const selectedSource = ref('');
   const previousRun = shallowRef<RunResponse | null>(null);
   const previousRequest = ref<string | null>(null);
   const busy = ref(false);
@@ -62,11 +66,25 @@ export function useLab() {
   const runsCompleted = ref(0);
   const loaded = ref(false);
 
-  const selectedEntry = computed(() => shelf.value.find((entry) => entry.task.id === taskId.value) ?? null);
+  const selectedEntry = computed(
+    () => shelf.value.find((entry) => entry.task.id === taskId.value) ?? null,
+  );
   const selectedTask = computed(() => selectedEntry.value?.task ?? null);
-  const compiled = computed(() => selectedEntry.value?.compiled ?? run.value?.compiled ?? null);
+  const runMatchesSelection = computed(
+    () => runTaskId.value !== null && runTaskId.value === taskId.value,
+  );
+  const compiled = computed(() =>
+    runMatchesSelection.value && run.value
+      ? run.value.compiled
+      : (selectedEntry.value?.compiled ?? null),
+  );
+  const source = computed(() =>
+    runMatchesSelection.value ? (run.value?.source ?? '') : selectedSource.value,
+  );
   const canRun = computed(() => (selectedTask.value?.worlds ?? []).includes('aracnid'));
-  const activeScenario = computed(() => scenarios.value.find((entry) => entry.id === scenario.value) ?? null);
+  const activeScenario = computed(
+    () => scenarios.value.find((entry) => entry.id === scenario.value) ?? null,
+  );
 
   const request = computed<RunRequest>(() => ({
     taskId: taskId.value,
@@ -83,7 +101,23 @@ export function useLab() {
   const determinism = computed<'identical' | 'diverged' | null>(() => {
     if (!run.value || !previousRun.value || !previousRequest.value) return null;
     if (previousRequest.value !== JSON.stringify(request.value)) return null;
-    return run.value.run.journalHash === previousRun.value.run.journalHash ? 'identical' : 'diverged';
+    return run.value.run.journalHash === previousRun.value.run.journalHash
+      ? 'identical'
+      : 'diverged';
+  });
+
+  /** Source of the selected task, for the review panel before anything has run. */
+  async function loadTaskSource(id: string): Promise<void> {
+    try {
+      const response = await $fetch<TaskResponse>(`/api/tasks/${id}`);
+      if (taskId.value === id) selectedSource.value = response.source;
+    } catch {
+      if (taskId.value === id) selectedSource.value = '';
+    }
+  }
+
+  watch(taskId, (id) => {
+    void loadTaskSource(id);
   });
 
   async function load(): Promise<void> {
@@ -99,6 +133,7 @@ export function useLab() {
       geometry.value = catalogue.geometry;
       loaded.value = true;
       error.value = null;
+      await loadTaskSource(taskId.value);
     } catch (cause) {
       const shaped = cause as FetchErrorShape;
       error.value = shaped.data?.message ?? shaped.message ?? String(cause);
@@ -120,6 +155,7 @@ export function useLab() {
       // Immutable result data: marked raw so a reactive lab never walks 300
       // journal events looking for something to track.
       run.value = markRaw(response);
+      runTaskId.value = request.value.taskId;
       runsCompleted.value += 1;
       return response;
     } catch (cause) {
@@ -135,14 +171,13 @@ export function useLab() {
 
   function addFault(kind: string, atMs: number, hand?: number): void {
     const takesHand = faultKinds.value.find((entry) => entry.id === kind)?.takesHand ?? false;
-    faults.value = [
-      ...faults.value,
-      { atMs, kind, ...(takesHand ? { hand: hand ?? 1 } : {}) },
-    ];
+    faults.value = [...faults.value, { atMs, kind, ...(takesHand ? { hand: hand ?? 1 } : {}) }];
   }
 
   function updateFault(index: number, patch: Partial<LabFaultRequest>): void {
-    faults.value = faults.value.map((fault, position) => (position === index ? { ...fault, ...patch } : fault));
+    faults.value = faults.value.map((fault, position) =>
+      position === index ? { ...fault, ...patch } : fault,
+    );
   }
 
   function removeFault(index: number): void {
@@ -177,6 +212,10 @@ export function useLab() {
     activeScenario,
     // result
     run,
+    runTaskId,
+    runMatchesSelection,
+    selectedSource,
+    source,
     previousRun,
     busy,
     error,
@@ -185,6 +224,7 @@ export function useLab() {
     determinism,
     // actions
     load,
+    loadTaskSource,
     execute,
     addFault,
     updateFault,

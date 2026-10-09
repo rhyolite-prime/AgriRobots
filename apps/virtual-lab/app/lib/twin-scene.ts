@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import type { TwinFrameData } from '../../shared/lab-types';
+import type { TwinFrameData } from '../shared/lab-types';
 
 /**
  * The ARACNID kinematic twin.
@@ -250,8 +250,17 @@ export class AracnidTwinScene {
 
     // Datum A: the arm-ring reference plane from docs/10 section 5.
     const datum = new THREE.Mesh(
-      new THREE.RingGeometry(this.geometry.ringRadiusM - 0.03, this.geometry.ringRadiusM + 0.03, 64),
-      new THREE.MeshBasicMaterial({ color: 0x3d6f9e, transparent: true, opacity: 0.5, side: THREE.DoubleSide }),
+      new THREE.RingGeometry(
+        this.geometry.ringRadiusM - 0.03,
+        this.geometry.ringRadiusM + 0.03,
+        64,
+      ),
+      new THREE.MeshBasicMaterial({
+        color: 0x3d6f9e,
+        transparent: true,
+        opacity: 0.5,
+        side: THREE.DoubleSide,
+      }),
     );
     datum.rotation.x = -Math.PI / 2;
     datum.position.y = this.geometry.ringHeightMm / 1000;
@@ -263,7 +272,12 @@ export class AracnidTwinScene {
         this.geometry.reachMm / 1000,
         96,
       ),
-      new THREE.MeshBasicMaterial({ color: 0x2f5d7c, transparent: true, opacity: 0.35, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({
+        color: 0x2f5d7c,
+        transparent: true,
+        opacity: 0.35,
+        side: THREE.DoubleSide,
+      }),
     );
     reach.rotation.x = -Math.PI / 2;
     reach.position.y = 0.006;
@@ -324,7 +338,11 @@ export class AracnidTwinScene {
     this.body.add(mast);
 
     const wheelGeometry = new THREE.CylinderGeometry(wheelR, wheelR, 0.16, 24);
-    const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x14181d, roughness: 0.9, metalness: 0.1 });
+    const wheelMaterial = new THREE.MeshStandardMaterial({
+      color: 0x14181d,
+      roughness: 0.9,
+      metalness: 0.1,
+    });
     for (const [x, z] of [
       [-track / 2, -wheelbase / 2],
       [track / 2, -wheelbase / 2],
@@ -362,7 +380,13 @@ export class AracnidTwinScene {
       const mount = new THREE.Group();
       // ROS angle is measured from forward (+x) towards left (+y); in Three.js
       // forward is -z and left is -x, which is a rotation about +y.
-      mount.position.copy(toThree(Math.cos(baseAngle) * this.geometry.ringRadiusM, Math.sin(baseAngle) * this.geometry.ringRadiusM, ringHeight));
+      mount.position.copy(
+        toThree(
+          Math.cos(baseAngle) * this.geometry.ringRadiusM,
+          Math.sin(baseAngle) * this.geometry.ringRadiusM,
+          ringHeight,
+        ),
+      );
       mount.rotation.y = baseAngle;
       this.body.add(mount);
 
@@ -413,7 +437,10 @@ export class AracnidTwinScene {
 
       const heldEgg = new THREE.Mesh(
         new THREE.SphereGeometry(0.023, 16, 12),
-        new THREE.MeshStandardMaterial({ color: GRADE_COLOURS['saleable'] ?? 0xf2e3c2, roughness: 0.55 }),
+        new THREE.MeshStandardMaterial({
+          color: GRADE_COLOURS['saleable'] ?? 0xf2e3c2,
+          roughness: 0.55,
+        }),
       );
       heldEgg.scale.set(1, 1.28, 1);
       heldEgg.position.y = -0.075;
@@ -473,7 +500,12 @@ export class AracnidTwinScene {
     group.add(head);
     const halo = new THREE.Mesh(
       new THREE.RingGeometry(0.55, 0.62, 48),
-      new THREE.MeshBasicMaterial({ color: 0xff9d3d, transparent: true, opacity: 0.75, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({
+        color: 0xff9d3d,
+        transparent: true,
+        opacity: 0.75,
+        side: THREE.DoubleSide,
+      }),
     );
     halo.rotation.x = -Math.PI / 2;
     halo.position.y = 0.02;
@@ -500,7 +532,12 @@ export class AracnidTwinScene {
       if (this.slotMeshes.has(slot.id)) continue;
       const ring = new THREE.Mesh(
         new THREE.RingGeometry(0.032, 0.042, 24),
-        new THREE.MeshBasicMaterial({ color: 0x5d6f7f, transparent: true, opacity: 0.5, side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({
+          color: 0x5d6f7f,
+          transparent: true,
+          opacity: 0.5,
+          side: THREE.DoubleSide,
+        }),
       );
       ring.rotation.x = -Math.PI / 2;
       ring.position.copy(toThree(slot.x, slot.y, slot.z + 0.001));
@@ -542,8 +579,12 @@ export class AracnidTwinScene {
       const scale = 0.72 + 0.28 * Math.min(1, Math.max(0, arm.extension));
       rig.forearm.scale.y = scale;
       rig.wrist.position.y = -0.3 * scale;
-      rig.stateMaterial.color.setHex(ARM_STATE_COLOURS[arm.state] ?? ARM_STATE_COLOURS['stowed'] ?? 0x616470);
-      rig.stateMaterial.emissive.setHex(arm.state === 'fault' ? 0x5a1109 : arm.suctionKpa > 1 ? 0x0d2a17 : 0x000000);
+      rig.stateMaterial.color.setHex(
+        ARM_STATE_COLOURS[arm.state] ?? ARM_STATE_COLOURS['stowed'] ?? 0x616470,
+      );
+      rig.stateMaterial.emissive.setHex(
+        arm.state === 'fault' ? 0x5a1109 : arm.suctionKpa > 1 ? 0x0d2a17 : 0x000000,
+      );
       rig.heldEgg.visible = arm.holding !== null;
       rig.label.material.opacity = arm.state === 'stowed' ? 0.35 : 1;
     });
@@ -595,7 +636,11 @@ export class AracnidTwinScene {
     const presence = frame.safety.tripped.includes('SF-AR-07');
     this.worker.visible = presence;
     if (presence) {
-      this.worker.position.set(this.nestGroup.position.x + 0.75, 0, this.nestGroup.position.z + 0.35);
+      this.worker.position.set(
+        this.nestGroup.position.x + 0.75,
+        0,
+        this.nestGroup.position.z + 0.35,
+      );
     }
 
     const tilting = frame.carrier.tilt >= 4;

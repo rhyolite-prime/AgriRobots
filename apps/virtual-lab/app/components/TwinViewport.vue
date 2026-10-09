@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue';
 
-import type { TwinFrameData } from '../../shared/lab-types';
-import { frameAt } from '../../shared/safety-view';
+import type { TwinFrameData } from '../shared/lab-types';
+import { frameAt } from '../shared/safety-view';
 import type { Lab } from '../composables/useLab';
 import type { Playback } from '../composables/usePlayback';
 import {
@@ -76,7 +76,9 @@ const currentStatement = computed(() => {
   return found;
 });
 
-const holding = computed(() => (current.value?.arms ?? []).filter((arm) => arm.holding !== null).length);
+const holding = computed(
+  () => (current.value?.arms ?? []).filter((arm) => arm.holding !== null).length,
+);
 
 function render(): void {
   const frame = current.value;
@@ -109,7 +111,10 @@ watch(frames, () => {
       <h2>Kinematic twin — AR-01 / EG-08</h2>
       <div class="row">
         <span class="pill pill-muted">frame {{ frameIndex + 1 }} / {{ frames.length }}</span>
-        <span class="pill" :class="current?.safety.state === 'AUTO_TASK' ? 'pill-ok' : 'pill-danger'">
+        <span
+          class="pill"
+          :class="current?.safety.state === 'AUTO_TASK' ? 'pill-ok' : 'pill-danger'"
+        >
           <i class="dot" />
           {{ current?.safety.state ?? 'UNKNOWN' }}
         </span>
@@ -121,10 +126,15 @@ watch(frames, () => {
 
       <div class="viewport-overlay">
         <span class="pill pill-accent">
-          {{ currentStatement ? `${currentStatement.id} · ${currentStatement.kind}` : 'awaiting first statement' }}
+          {{
+            currentStatement
+              ? `${currentStatement.id} · ${currentStatement.kind}`
+              : 'awaiting first statement'
+          }}
         </span>
         <span class="pill pill-muted">
-          tilt {{ (current?.carrier.tilt ?? 0).toFixed(2) }}° · battery {{ (current?.carrier.battery ?? 0).toFixed(1) }}%
+          tilt {{ (current?.carrier.tilt ?? 0).toFixed(2) }}° · battery
+          {{ (current?.carrier.battery ?? 0).toFixed(1) }}%
         </span>
         <span class="pill pill-muted">
           {{ holding }} of {{ current?.arms.length ?? 8 }} hands holding · magazine
@@ -149,8 +159,8 @@ watch(frames, () => {
       <div v-if="frames.length === 0" class="viewport-empty">
         <strong>No run yet</strong>
         <span>
-          Compile and run the ARACNID round to fill this viewport with twin frames. The robot below is drawn from the
-          geometry the world model reports, not from a CAD import.
+          Compile and run the ARACNID round to fill this viewport with twin frames. The robot below
+          is drawn from the geometry the world model reports, not from a CAD import.
         </span>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { defineEventHandler } from 'h3';
 
 import { ARACNID } from '@agrirobots/engine';
 
-import { ARACNID_FAULT_KINDS, ARACNID_SCENARIOS, NEST_LAYOUTS } from '../../shared/scenarios';
+import { ARACNID_FAULT_KINDS, ARACNID_SCENARIOS, NEST_LAYOUTS } from '../../app/shared/scenarios';
 
 /**
  * What the lab may ask the ARACNID world to do, and the geometry it will draw.

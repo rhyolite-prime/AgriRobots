@@ -50,7 +50,11 @@ function list(value: unknown): string[] {
 }
 
 /** Replays journal lines up to (and including) the given time. */
-export function deriveSafetyView(lines: readonly JournalLine[], untilT: number, frame?: TwinFrameData | null): SafetyView {
+export function deriveSafetyView(
+  lines: readonly JournalLine[],
+  untilT: number,
+  frame?: TwinFrameData | null,
+): SafetyView {
   const permits = new Map<string, PermitView>();
   const claims = new Map<string, ClaimView>();
   const tripped = new Set<string>();
@@ -63,11 +67,15 @@ export function deriveSafetyView(lines: readonly JournalLine[], untilT: number, 
   let degraded: string | null = null;
 
   for (const line of lines) {
-    if (line.t > untilT) break;
+    // The journal is in causal order: at a parallel join a branch that finished
+    // earlier in mission time can be written later. Skipping rather than breaking
+    // keeps the view a function of the playhead alone.
+    if (line.t > untilT) continue;
     const payload = line.payload;
     switch (line.kind) {
       case 'permit.granted': {
-        const permitId = text(payload['permitId']) || `${text(payload['holder'])}:${text(payload['kind'])}`;
+        const permitId =
+          text(payload['permitId']) || `${text(payload['holder'])}:${text(payload['kind'])}`;
         permits.set(permitId, {
           permitId,
           kind: text(payload['kind']),
@@ -123,13 +131,23 @@ export function deriveSafetyView(lines: readonly JournalLine[], untilT: number, 
       case 'safety.inhibited':
         inhibited = true;
         for (const id of list(payload['functions'])) tripped.add(id);
-        for (const reason of list(payload['reasons'])) if (!reasons.includes(reason)) reasons.push(reason);
+        for (const reason of list(payload['reasons']))
+          if (!reasons.includes(reason)) reasons.push(reason);
         break;
       case 'guard.breached':
         guardBreaches.push({ t: line.t, id: text(payload['id']) });
         break;
       case 'fault.entered':
-        if (payload['inhibited'] === true) inhibited = true;
+        if (payload['inhibited'] === true) {
+          inhibited = true;
+          // A guard breach or a refused permit inhibits through its fault clause,
+          // not through a `safety.inhibited` event, so the reason is taken here or
+          // the panel would show an inhibition it cannot explain.
+          const code = text(payload['code']);
+          const detail = text(payload['message']);
+          const reason = code ? `${code}${detail ? `: ${detail}` : ''}` : detail;
+          if (reason && !reasons.includes(reason)) reasons.push(reason);
+        }
         break;
       case 'mode.degraded':
         degraded = text(payload['to']) || degraded;
@@ -159,9 +177,13 @@ export function deriveSafetyView(lines: readonly JournalLine[], untilT: number, 
 }
 
 /** The twin frame to draw at a mission time, plus the blend into the next one. */
-export function frameAt(frames: readonly TwinFrameData[], t: number): { frame: TwinFrameData | null; next: TwinFrameData | null; alpha: number } {
+export function frameAt(
+  frames: readonly TwinFrameData[],
+  t: number,
+): { frame: TwinFrameData | null; next: TwinFrameData | null; alpha: number } {
   if (frames.length === 0) return { frame: null, next: null, alpha: 1 };
-  if (t <= (frames[0]?.t ?? 0)) return { frame: frames[0] ?? null, next: frames[1] ?? null, alpha: 0 };
+  if (t <= (frames[0]?.t ?? 0))
+    return { frame: frames[0] ?? null, next: frames[1] ?? null, alpha: 0 };
   for (let index = 0; index < frames.length - 1; index += 1) {
     const current = frames[index]!;
     const following = frames[index + 1]!;
@@ -178,7 +200,7 @@ export function frameAt(frames: readonly TwinFrameData[], t: number): { frame: T
 export function visitedStatements(lines: readonly JournalLine[], untilT: number): string[] {
   const seen: string[] = [];
   for (const line of lines) {
-    if (line.t > untilT) break;
+    if (line.t > untilT) continue;
     if (line.kind !== 'statement.entered') continue;
     const id = line.statementId;
     if (id && !seen.includes(id)) seen.push(id);

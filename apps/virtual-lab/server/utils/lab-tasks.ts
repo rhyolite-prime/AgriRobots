@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { DSL_EXAMPLES_DIR, repoFile } from '@agrirobots/compiler-core';
 
-import type { LabTaskSummary } from '../../shared/lab-types';
+import type { LabTaskSummary } from '../../app/shared/lab-types';
 
 /**
  * The tasks the lab may load, and the only ones it may load.

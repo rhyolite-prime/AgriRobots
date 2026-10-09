@@ -11,7 +11,11 @@ export interface ExprNode {
 }
 
 function isNode(value: unknown): value is ExprNode {
-  return typeof value === 'object' && value !== null && typeof (value as { kind?: unknown }).kind === 'string';
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as { kind?: unknown }).kind === 'string'
+  );
 }
 
 function renderMany(nodes: unknown, join: string): string {
@@ -26,14 +30,17 @@ export function renderExpr(node: unknown): string {
     case 'number':
     case 'string':
     case 'boolean':
-      return typeof node['value'] === 'string' ? `"${String(node['value'])}"` : String(node['value']);
+      return typeof node['value'] === 'string'
+        ? `"${String(node['value'])}"`
+        : String(node['value']);
     case 'null':
       return 'null';
     case 'enum':
       return `#${String(node['name'])}`;
     case 'ref': {
       const base = node['base'] as { type?: string; root?: string; name?: string } | undefined;
-      let out = base?.type === 'variable' ? `$${String(base.name ?? '')}` : String(base?.root ?? '');
+      let out =
+        base?.type === 'variable' ? `$${String(base.name ?? '')}` : String(base?.root ?? '');
       for (const step of (node['steps'] ?? []) as Array<Record<string, unknown>>) {
         if (step['type'] === 'field') out += `.${String(step['name'])}`;
         else out += `[${renderExpr(step['expr'])}]`;

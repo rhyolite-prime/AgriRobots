@@ -88,7 +88,22 @@ export function usePlayback() {
 
   onScopeDispose(stopLoop);
 
-  return { t, duration, playing, speed, loop, progress, atEnd, play, pause, toggle, seek, nudge, reset, setSpeed };
+  return {
+    t,
+    duration,
+    playing,
+    speed,
+    loop,
+    progress,
+    atEnd,
+    play,
+    pause,
+    toggle,
+    seek,
+    nudge,
+    reset,
+    setSpeed,
+  };
 }
 
 export type PlaybackState = ReturnType<typeof usePlayback>;

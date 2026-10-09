@@ -13,7 +13,8 @@
     "packages/domain-model",
     "packages/compiler-core",
     "packages/policy",
-    "packages/engine"
+    "packages/engine",
+    "apps/virtual-lab"
   ],
   "scripts": {
     "check:tree": "node scripts/check-tree.mjs",

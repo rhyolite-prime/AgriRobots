@@ -1,7 +1,7 @@
 import type { CompiledTask } from '@agrirobots/compiler-core';
 
-import { renderAssertion } from '../../shared/ir-render';
-import type { CompiledSummary } from '../../shared/lab-types';
+import { renderAssertion } from '../../app/shared/ir-render';
+import type { CompiledSummary } from '../../app/shared/lab-types';
 
 /**
  * Reduces a compiled task to what the browser shows: identity, hashes, limits,

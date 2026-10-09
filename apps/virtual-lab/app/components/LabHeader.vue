@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { EXIT_CODE_MEANINGS } from '../../shared/safety-functions';
+import { EXIT_CODE_MEANINGS } from '../shared/safety-functions';
 import type { Lab } from '../composables/useLab';
 
 const props = defineProps<{ lab: Lab }>();
@@ -47,15 +47,21 @@ function shortHash(hash: string | undefined): string {
     <div class="header-facts">
       <div class="fact">
         <span class="label">Task</span>
-        <span class="value">{{ run?.compiled.taskName ?? lab.taskId }}@{{ run?.compiled.taskVersion ?? '—' }}</span>
+        <span class="value"
+          >{{ run?.compiled.taskName ?? lab.taskId }}@{{ run?.compiled.taskVersion ?? '—' }}</span
+        >
       </div>
       <div class="fact">
         <span class="label">IR hash</span>
-        <span class="value" :title="run?.compiled.irHash">{{ shortHash(run?.compiled.irHash) }}</span>
+        <span class="value" :title="run?.compiled.irHash">{{
+          shortHash(run?.compiled.irHash)
+        }}</span>
       </div>
       <div class="fact">
         <span class="label">Journal hash</span>
-        <span class="value" :title="run?.run.journalHash">{{ shortHash(run?.run.journalHash) }}</span>
+        <span class="value" :title="run?.run.journalHash">{{
+          shortHash(run?.run.journalHash)
+        }}</span>
       </div>
       <div class="fact">
         <span class="label">Determinism</span>

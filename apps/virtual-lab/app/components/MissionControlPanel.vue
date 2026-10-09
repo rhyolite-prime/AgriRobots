@@ -45,7 +45,11 @@ function onFaultHand(index: number, event: Event): void {
 }
 
 function addFault(): void {
-  props.lab.addFault(newFaultKind.value, Math.max(0, Math.trunc(newFaultAtMs.value)), newFaultHand.value);
+  props.lab.addFault(
+    newFaultKind.value,
+    Math.max(0, Math.trunc(newFaultAtMs.value)),
+    newFaultHand.value,
+  );
 }
 
 function randomSeed(): void {
@@ -76,14 +80,17 @@ async function run(): Promise<void> {
           {{ lab.selectedTask.robot }} — {{ lab.selectedTask.summary }}
         </p>
         <div v-if="lab.selectedTask && !lab.canRun" class="notice notice-warn">
-          No world model exists for this task yet, so it can be compiled, hashed and reviewed here, but not executed.
+          No world model exists for this task yet, so it can be compiled, hashed and reviewed here,
+          but not executed.
         </div>
       </div>
 
       <div class="field">
         <label for="scenario">Scenario</label>
         <select id="scenario" v-model="lab.scenario">
-          <option v-for="entry in lab.scenarios" :key="entry.id" :value="entry.id">{{ entry.label }}</option>
+          <option v-for="entry in lab.scenarios" :key="entry.id" :value="entry.id">
+            {{ entry.label }}
+          </option>
         </select>
         <p v-if="scenario" class="hint">{{ scenario.description }}</p>
         <p v-if="scenario" class="hint"><strong>Expect:</strong> {{ scenario.expects }}</p>
@@ -96,12 +103,21 @@ async function run(): Promise<void> {
         </div>
         <div class="field">
           <label for="eggs">Eggs in bank</label>
-          <input id="eggs" v-model="eggsModel" type="number" min="1" max="240" placeholder="scenario default" />
+          <input
+            id="eggs"
+            v-model="eggsModel"
+            type="number"
+            min="1"
+            max="240"
+            placeholder="scenario default"
+          />
         </div>
       </div>
       <div class="row">
         <button class="btn btn-small" type="button" @click="randomSeed">random seed</button>
-        <button class="btn btn-small" type="button" @click="lab.seed = 20261009">default seed</button>
+        <button class="btn btn-small" type="button" @click="lab.seed = 20261009">
+          default seed
+        </button>
       </div>
 
       <div class="field">
@@ -117,7 +133,9 @@ async function run(): Promise<void> {
 
       <div class="field">
         <span class="field-label">Injected faults</span>
-        <div v-if="lab.faults.length === 0" class="empty">None — the scenario's own faults still apply.</div>
+        <div v-if="lab.faults.length === 0" class="empty">
+          None — the scenario's own faults still apply.
+        </div>
         <table v-else class="table">
           <thead>
             <tr>
@@ -153,7 +171,13 @@ async function run(): Promise<void> {
                 <span v-else class="hint">—</span>
               </td>
               <td>
-                <button class="btn btn-small btn-ghost" type="button" @click="lab.removeFault(index)">remove</button>
+                <button
+                  class="btn btn-small btn-ghost"
+                  type="button"
+                  @click="lab.removeFault(index)"
+                >
+                  remove
+                </button>
               </td>
             </tr>
           </tbody>
@@ -161,7 +185,9 @@ async function run(): Promise<void> {
 
         <div class="row">
           <select v-model="newFaultKind" style="flex: 2">
-            <option v-for="kind in lab.faultKinds" :key="kind.id" :value="kind.id">{{ kind.label }}</option>
+            <option v-for="kind in lab.faultKinds" :key="kind.id" :value="kind.id">
+              {{ kind.label }}
+            </option>
           </select>
           <input
             v-model.number="newFaultAtMs"
@@ -190,7 +216,9 @@ async function run(): Promise<void> {
       </label>
 
       <div v-if="lab.error" class="issue">
-        <div class="code">{{ lab.issues.length > 0 ? 'refused by the toolchain' : 'request failed' }}</div>
+        <div class="code">
+          {{ lab.issues.length > 0 ? 'refused by the toolchain' : 'request failed' }}
+        </div>
         <div>{{ lab.error }}</div>
         <ul v-if="lab.issues.length > 0">
           <li v-for="(issue, index) in lab.issues" :key="index" class="mono">
@@ -211,8 +239,8 @@ async function run(): Promise<void> {
         {{ lab.busy ? 'compiling and executing…' : 'Compile and run the round' }}
       </button>
       <p class="hint" style="margin: 7px 0 0">
-        {{ lab.runsCompleted }} run{{ lab.runsCompleted === 1 ? '' : 's' }} this session. Same seed and scenario give
-        the same journal hash.
+        {{ lab.runsCompleted }} run{{ lab.runsCompleted === 1 ? '' : 's' }} this session. Same seed
+        and scenario give the same journal hash.
       </p>
     </div>
   </section>

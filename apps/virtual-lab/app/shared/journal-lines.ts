@@ -147,10 +147,32 @@ export function summariseEvent(kind: string, payload: Record<string, unknown>): 
 }
 
 /** Kinds the timeline hides by default: they are rendered, not read. */
-export const NOISY_KINDS: readonly string[] = ['twin.frame', 'statement.completed', 'permit.requested', 'resource.claimed', 'resource.released', 'permit.released'];
+export const NOISY_KINDS: readonly string[] = [
+  'twin.frame',
+  'statement.completed',
+  'permit.requested',
+  'resource.claimed',
+  'resource.released',
+  'permit.released',
+];
+
+/**
+ * The same rows in mission-time order.
+ *
+ * The journal itself stays in causal order — that is the audit record, and at a
+ * parallel join a branch that finished earlier can be written later. Anything
+ * that scrubs by time (the playhead, "what had happened by t") uses this instead.
+ * The sort is stable and tie-broken on `sequence`, so it is deterministic.
+ */
+export function inTimeOrder(lines: readonly JournalLine[]): JournalLine[] {
+  return [...lines].sort((left, right) =>
+    left.t === right.t ? left.sequence - right.sequence : left.t - right.t,
+  );
+}
 
 export function elapsedMsOf(event: RawJournalEvent, epochMs: number): number {
-  if (typeof event.monotonicNs === 'number') return Math.round(event.monotonicNs / 1_000_000 - epochMs);
+  if (typeof event.monotonicNs === 'number')
+    return Math.round(event.monotonicNs / 1_000_000 - epochMs);
   const parsed = Date.parse(event.timestamp);
   return Number.isFinite(parsed) ? parsed - epochMs : 0;
 }

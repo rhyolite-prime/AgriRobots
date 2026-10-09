@@ -10,12 +10,12 @@ import {
 } from '@agrirobots/engine';
 import { compileAgriTaskSource } from '@agrirobots/policy';
 
-import { toJournalLine } from '../../shared/journal-lines';
-import type { LabFaultRequest, RunRequest, RunResponse } from '../../shared/lab-types';
-import { ARACNID_FAULT_KINDS, isFaultKind, isScenario } from '../../shared/scenarios';
-import { toCompiledSummary } from '../utils/compiled-summary';
-import { labError } from '../utils/errors';
-import { findLabTask, readLabTaskSource } from '../utils/lab-tasks';
+import { toJournalLine } from '../../../app/shared/journal-lines';
+import type { LabFaultRequest, RunRequest, RunResponse } from '../../../app/shared/lab-types';
+import { ARACNID_FAULT_KINDS, isFaultKind, isScenario } from '../../../app/shared/scenarios';
+import { toCompiledSummary } from '../../utils/compiled-summary';
+import { labError } from '../../utils/errors';
+import { findLabTask, readLabTaskSource } from '../../utils/lab-tasks';
 
 const DEFAULT_SEED = 20261009;
 
@@ -30,15 +30,24 @@ function positiveInteger(value: unknown, fallback: number, ceiling: number): num
 
 function toFaults(input: unknown): AracnidFault[] {
   if (input === undefined || input === null) return [];
-  if (!Array.isArray(input)) refuse(400, 'E_LAB_FAULTS', 'faults must be an array of injected faults');
+  if (!Array.isArray(input))
+    refuse(400, 'E_LAB_FAULTS', 'faults must be an array of injected faults');
   return input.map((entry, index): AracnidFault => {
     const fault = entry as Partial<LabFaultRequest>;
     const kind = typeof fault.kind === 'string' ? fault.kind : '';
     if (!isFaultKind(kind)) {
-      refuse(400, 'E_LAB_FAULT_KIND', `faults[${String(index)}].kind "${kind}" is not modelled by the ARACNID world`);
+      refuse(
+        400,
+        'E_LAB_FAULT_KIND',
+        `faults[${String(index)}].kind "${kind}" is not modelled by the ARACNID world`,
+      );
     }
-    const atMs = typeof fault.atMs === 'number' && Number.isFinite(fault.atMs) ? Math.max(0, Math.trunc(fault.atMs)) : 0;
-    const takesHand = ARACNID_FAULT_KINDS.find((candidate) => candidate.id === kind)?.takesHand ?? false;
+    const atMs =
+      typeof fault.atMs === 'number' && Number.isFinite(fault.atMs)
+        ? Math.max(0, Math.trunc(fault.atMs))
+        : 0;
+    const takesHand =
+      ARACNID_FAULT_KINDS.find((candidate) => candidate.id === kind)?.takesHand ?? false;
     const hand = typeof fault.hand === 'number' ? Math.trunc(fault.hand) : undefined;
     if (takesHand && (hand === undefined || hand < 1 || hand > ARACNID.handCount)) {
       refuse(
@@ -62,7 +71,8 @@ export default defineEventHandler(async (event): Promise<RunResponse> => {
   const body = (await readBody<Partial<RunRequest>>(event)) ?? {};
 
   const task = findLabTask(body.taskId);
-  if (!task) refuse(404, 'E_LAB_TASK_UNKNOWN', `no task "${String(body.taskId ?? '')}" on the lab shelf`);
+  if (!task)
+    refuse(404, 'E_LAB_TASK_UNKNOWN', `no task "${String(body.taskId ?? '')}" on the lab shelf`);
   if (!task.worlds.includes('aracnid')) {
     refuse(
       422,
@@ -71,8 +81,23 @@ export default defineEventHandler(async (event): Promise<RunResponse> => {
     );
   }
 
+  // The world is a property of the task, not of the request: this lab implements
+  // one world model, so anything else is refused rather than silently substituted.
+  const worldId = body.world ?? 'aracnid';
+  if (worldId !== 'aracnid') {
+    refuse(
+      422,
+      'E_LAB_WORLD_UNSUPPORTED',
+      `this lab executes the "aracnid" world; "${worldId}" has no world model in this repository`,
+    );
+  }
+  if (!task.worlds.includes(worldId)) {
+    refuse(422, 'E_LAB_WORLD_MISMATCH', `${task.id} is not written for the "${worldId}" world`);
+  }
+
   const scenario = typeof body.scenario === 'string' ? body.scenario : 'nominal';
-  if (!isScenario(scenario)) refuse(400, 'E_LAB_SCENARIO_UNKNOWN', `scenario "${scenario}" is not modelled`);
+  if (!isScenario(scenario))
+    refuse(400, 'E_LAB_SCENARIO_UNKNOWN', `scenario "${scenario}" is not modelled`);
 
   const nestLayout = body.nestLayout ?? 'arc';
   if (nestLayout !== 'arc' && nestLayout !== 'straight') {
@@ -81,8 +106,10 @@ export default defineEventHandler(async (event): Promise<RunResponse> => {
 
   const seed = positiveInteger(body.seed, DEFAULT_SEED, Number.MAX_SAFE_INTEGER);
   const faults = toFaults(body.faults);
-  const maxVisits = body.maxVisits === undefined ? undefined : positiveInteger(body.maxVisits, 5000, 100_000);
-  const eggsInBank = body.eggsInBank === undefined ? undefined : positiveInteger(body.eggsInBank, 16, 240);
+  const maxVisits =
+    body.maxVisits === undefined ? undefined : positiveInteger(body.maxVisits, 5000, 100_000);
+  const eggsInBank =
+    body.eggsInBank === undefined ? undefined : positiveInteger(body.eggsInBank, 16, 240);
 
   const source = readLabTaskSource(task);
   let compiled;

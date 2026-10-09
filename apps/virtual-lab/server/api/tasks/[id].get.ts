@@ -2,7 +2,7 @@ import { createError, defineEventHandler, getRouterParam } from 'h3';
 
 import { compileAgriTaskSource } from '@agrirobots/policy';
 
-import type { TaskResponse } from '../../../shared/lab-types';
+import type { TaskResponse } from '../../../app/shared/lab-types';
 import { toCompiledSummary } from '../../utils/compiled-summary';
 import { labError } from '../../utils/errors';
 import { findLabTask, readLabTaskSource } from '../../utils/lab-tasks';
