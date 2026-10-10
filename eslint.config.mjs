@@ -11,6 +11,9 @@ export default tseslint.config(
       '**/.output/**',
       '**/coverage/**',
       'ros_ws/**',
+      // Vendored C++ sources and CMake output are not this repository's to lint.
+      'engine/third_party/**',
+      'engine/build/**',
     ],
   },
   js.configs.recommended,

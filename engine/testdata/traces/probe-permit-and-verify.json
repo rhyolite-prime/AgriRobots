@@ -1,0 +1,1394 @@
+{
+  "fixtureVersion": 1,
+  "generator": "packages/engine/test/golden-traces.test.ts",
+  "contract": "docs/09_DSL_AND_EXECUTION_ENGINE.md section 7",
+  "name": "probe-permit-and-verify",
+  "reference": {
+    "engine": "@agrirobots/engine",
+    "language": "TypeScript",
+    "epochMs": 1791565200000
+  },
+  "task": {
+    "id": "golden-probe",
+    "name": "golden-probe",
+    "version": "1.0.0",
+    "source": "meta {\n  owner \"farm-ops\";\n  change_ticket \"AGR-TEST-009\";\n  description \"Golden-trace probe: the smallest run that exercises a permit, quantities and verification.\";\n  tags \"test\";\n}\n\ntask golden-probe@1.0.0 {\n  requires {\n    cassette FD-01 with dispense_mass.v1;\n    operator supervisor_on_site;\n    zones house-3-feed-lane;\n    route house-3-feed-lane commissioned;\n    calibration sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba;\n  }\n\n  limits {\n    travel_speed  = 0.40 m/s;\n    task_deadline = 10 min;\n    tool_timeout  = 30 s;\n    max_retries   = 0 count;\n  }\n\n  preflight {\n    // ScriptedWorld reports mode AUTO_TASK and battery.charge, so the probe reads\n    // the same names the engine's own scripted tests use.\n    safety.mode == #AUTO_TASK @ within 500 ms;\n    cassette.latch == #LOCKED @ within 500 ms;\n    operator.present == true  @ within 500 ms;\n    battery.charge >= 35 %    @ within 2 s;\n  }\n\n  steps {\n    start_round: record probe.started {\n      task = task.name;\n      run  = task.run_id;\n      zone = zone.current_id;\n    };\n\n    to_lane: move along house-3-feed-lane at 0.35 m/s within 120 s;\n\n    dispense: with_permit tool_energy on tool[dispenser] for 60 s {\n      pour: actuate dispense_mass.v1 (\n              station = \"probe-station\",\n              mass    = 2.5 kg,\n              rate    = 0.30 kg/s\n            )\n            within 25 s\n            verify {\n              tool.dispensed_mass >= 2.4 kg @ within 2 s;\n              tool.dispensed_mass <= 2.6 kg @ within 2 s;\n            }\n            idempotency_key task.run_id + \":probe\";\n    };\n\n    done: finish success message = \"probe finished\";\n  }\n\n  on_fault {\n    stop: safe_stop reason = \"probe fault\";\n    end:  finish failed PROBE_FAULT message = \"probe faulted\";\n  }\n\n  evidence {\n    retain journal;\n    retention_days 30;\n  }\n}\n"
+  },
+  "world": {
+    "model": "ScriptedWorld",
+    "cassetteId": "FD-01",
+    "capabilities": [
+      "dispense_mass.v1"
+    ]
+  },
+  "run": {
+    "runId": "golden-probe-run",
+    "status": "completed",
+    "exitCode": 0,
+    "message": "probe finished",
+    "elapsedMs": 1250,
+    "visits": 5,
+    "tally": {
+      "offered": 0,
+      "picked": 0,
+      "placed": 0,
+      "cracked": 0,
+      "abstained": 0,
+      "rejected": 0
+    },
+    "safety": {
+      "state": "AUTO_TASK",
+      "tripped": [],
+      "inhibited": false,
+      "reasons": []
+    }
+  },
+  "ir": {
+    "irHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+    "sourceHash": "e7b26f98081b4c94e5b5fd9526a907d123aa278e11cbf9c540e4e1a42f89f66b",
+    "canonicalBytes": 4603,
+    "canonicalJson": "{\"evidence\":{\"retain\":[\"journal\"],\"retentionDays\":30},\"format\":\"agri.task-ir/v1\",\"index\":[{\"id\":\"start_round\",\"kind\":\"record\",\"label\":\"start_round\",\"parents\":[]},{\"id\":\"to_lane\",\"kind\":\"move\",\"label\":\"to_lane\",\"parents\":[]},{\"capability\":\"dispense_mass.v1\",\"id\":\"pour\",\"kind\":\"actuate\",\"label\":\"pour\",\"parents\":[\"dispense\"]},{\"id\":\"dispense\",\"kind\":\"with_permit\",\"label\":\"dispense\",\"parents\":[],\"permits\":[\"tool_energy\"]},{\"id\":\"done\",\"kind\":\"finish\",\"label\":\"done\",\"parents\":[]},{\"id\":\"stop\",\"kind\":\"safe_stop\",\"label\":\"stop\",\"parents\":[]},{\"id\":\"end\",\"kind\":\"finish\",\"label\":\"end\",\"parents\":[]}],\"limits\":[{\"key\":\"max_retries\",\"unit\":\"count\",\"value\":0},{\"key\":\"task_deadline\",\"unit\":\"min\",\"value\":10},{\"key\":\"tool_timeout\",\"unit\":\"s\",\"value\":30},{\"key\":\"travel_speed\",\"unit\":\"m/s\",\"value\":0.4}],\"meta\":{\"changeTicket\":\"AGR-TEST-009\",\"description\":\"Golden-trace probe: the smallest run that exercises a permit, quantities and verification.\",\"owner\":\"farm-ops\",\"tags\":[\"test\"]},\"onFault\":[{\"id\":\"stop\",\"kind\":\"safe_stop\",\"label\":\"stop\",\"reason\":{\"kind\":\"string\",\"value\":\"probe fault\"}},{\"errorCode\":\"PROBE_FAULT\",\"id\":\"end\",\"kind\":\"finish\",\"label\":\"end\",\"message\":{\"kind\":\"string\",\"value\":\"probe faulted\"},\"status\":\"failed\"}],\"preflight\":[{\"condition\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"safety\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"mode\",\"type\":\"field\"}]},\"op\":\"==\",\"right\":{\"kind\":\"enum\",\"name\":\"AUTO_TASK\"}},\"freshnessMs\":500},{\"condition\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"cassette\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"latch\",\"type\":\"field\"}]},\"op\":\"==\",\"right\":{\"kind\":\"enum\",\"name\":\"LOCKED\"}},\"freshnessMs\":500},{\"condition\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"operator\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"present\",\"type\":\"field\"}]},\"op\":\"==\",\"right\":{\"kind\":\"boolean\",\"value\":true}},\"freshnessMs\":500},{\"condition\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"battery\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"charge\",\"type\":\"field\"}]},\"op\":\">=\",\"right\":{\"kind\":\"quantity\",\"unit\":\"%\",\"value\":35}},\"freshnessMs\":2000}],\"requires\":{\"calibration\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\",\"capabilities\":[\"dispense_mass.v1\"],\"cassette\":\"FD-01\",\"operatorPolicy\":\"supervisor_on_site\",\"route\":{\"commissioned\":true,\"ref\":\"house-3-feed-lane\"},\"zones\":[\"house-3-feed-lane\"]},\"statistics\":{\"actuatingStatements\":2,\"capabilities\":[\"dispense_mass.v1\"],\"guards\":0,\"maxLoopBound\":0,\"maxParallelWidth\":0,\"maxRetryAttempts\":0,\"parallelBranches\":0,\"permitScopes\":1,\"resourceClaims\":[\"tool[dispenser]\"],\"statementCount\":7,\"subtaskCalls\":0,\"taskDeadlineMs\":600000},\"steps\":[{\"event\":\"probe.started\",\"fields\":[{\"name\":\"task\",\"value\":{\"base\":{\"root\":\"task\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"name\",\"type\":\"field\"}]}},{\"name\":\"run\",\"value\":{\"base\":{\"root\":\"task\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"run_id\",\"type\":\"field\"}]}},{\"name\":\"zone\",\"value\":{\"base\":{\"root\":\"zone\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"current_id\",\"type\":\"field\"}]}}],\"id\":\"start_round\",\"kind\":\"record\",\"label\":\"start_round\"},{\"id\":\"to_lane\",\"kind\":\"move\",\"label\":\"to_lane\",\"route\":{\"zone\":\"house-3-feed-lane\"},\"speed\":{\"unit\":\"m/s\",\"value\":0.35},\"within\":{\"ms\":120000,\"unit\":\"s\",\"value\":120}},{\"body\":[{\"args\":[{\"name\":\"station\",\"value\":{\"kind\":\"string\",\"value\":\"probe-station\"}},{\"name\":\"mass\",\"value\":{\"kind\":\"quantity\",\"unit\":\"kg\",\"value\":2.5}},{\"name\":\"rate\",\"value\":{\"kind\":\"quantity\",\"unit\":\"kg/s\",\"value\":0.3}}],\"capability\":\"dispense_mass.v1\",\"id\":\"pour\",\"idempotencyKey\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"task\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"run_id\",\"type\":\"field\"}]},\"op\":\"+\",\"right\":{\"kind\":\"string\",\"value\":\":probe\"}},\"kind\":\"actuate\",\"label\":\"pour\",\"verify\":[{\"condition\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"tool\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"dispensed_mass\",\"type\":\"field\"}]},\"op\":\">=\",\"right\":{\"kind\":\"quantity\",\"unit\":\"kg\",\"value\":2.4}},\"freshnessMs\":2000},{\"condition\":{\"kind\":\"binary\",\"left\":{\"base\":{\"root\":\"tool\",\"type\":\"state\"},\"kind\":\"ref\",\"steps\":[{\"name\":\"dispensed_mass\",\"type\":\"field\"}]},\"op\":\"<=\",\"right\":{\"kind\":\"quantity\",\"unit\":\"kg\",\"value\":2.6}},\"freshnessMs\":2000}],\"within\":{\"ms\":25000,\"unit\":\"s\",\"value\":25}}],\"id\":\"dispense\",\"kind\":\"with_permit\",\"label\":\"dispense\",\"lease\":{\"ms\":60000,\"unit\":\"s\",\"value\":60},\"on\":[{\"class\":\"tool\",\"instance\":\"dispenser\"}],\"permit\":\"tool_energy\"},{\"id\":\"done\",\"kind\":\"finish\",\"label\":\"done\",\"message\":{\"kind\":\"string\",\"value\":\"probe finished\"},\"status\":\"success\"}],\"task\":{\"name\":\"golden-probe\",\"version\":\"1.0.0\"}}",
+    "value": {
+      "format": "agri.task-ir/v1",
+      "task": {
+        "name": "golden-probe",
+        "version": "1.0.0"
+      },
+      "meta": {
+        "owner": "farm-ops",
+        "changeTicket": "AGR-TEST-009",
+        "description": "Golden-trace probe: the smallest run that exercises a permit, quantities and verification.",
+        "tags": [
+          "test"
+        ]
+      },
+      "requires": {
+        "cassette": "FD-01",
+        "capabilities": [
+          "dispense_mass.v1"
+        ],
+        "operatorPolicy": "supervisor_on_site",
+        "zones": [
+          "house-3-feed-lane"
+        ],
+        "route": {
+          "ref": "house-3-feed-lane",
+          "commissioned": true
+        },
+        "calibration": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+      },
+      "limits": [
+        {
+          "key": "max_retries",
+          "value": 0,
+          "unit": "count"
+        },
+        {
+          "key": "task_deadline",
+          "value": 10,
+          "unit": "min"
+        },
+        {
+          "key": "tool_timeout",
+          "value": 30,
+          "unit": "s"
+        },
+        {
+          "key": "travel_speed",
+          "value": 0.4,
+          "unit": "m/s"
+        }
+      ],
+      "preflight": [
+        {
+          "condition": {
+            "kind": "binary",
+            "op": "==",
+            "left": {
+              "kind": "ref",
+              "base": {
+                "type": "state",
+                "root": "safety"
+              },
+              "steps": [
+                {
+                  "type": "field",
+                  "name": "mode"
+                }
+              ]
+            },
+            "right": {
+              "kind": "enum",
+              "name": "AUTO_TASK"
+            }
+          },
+          "freshnessMs": 500
+        },
+        {
+          "condition": {
+            "kind": "binary",
+            "op": "==",
+            "left": {
+              "kind": "ref",
+              "base": {
+                "type": "state",
+                "root": "cassette"
+              },
+              "steps": [
+                {
+                  "type": "field",
+                  "name": "latch"
+                }
+              ]
+            },
+            "right": {
+              "kind": "enum",
+              "name": "LOCKED"
+            }
+          },
+          "freshnessMs": 500
+        },
+        {
+          "condition": {
+            "kind": "binary",
+            "op": "==",
+            "left": {
+              "kind": "ref",
+              "base": {
+                "type": "state",
+                "root": "operator"
+              },
+              "steps": [
+                {
+                  "type": "field",
+                  "name": "present"
+                }
+              ]
+            },
+            "right": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          "freshnessMs": 500
+        },
+        {
+          "condition": {
+            "kind": "binary",
+            "op": ">=",
+            "left": {
+              "kind": "ref",
+              "base": {
+                "type": "state",
+                "root": "battery"
+              },
+              "steps": [
+                {
+                  "type": "field",
+                  "name": "charge"
+                }
+              ]
+            },
+            "right": {
+              "kind": "quantity",
+              "value": 35,
+              "unit": "%"
+            }
+          },
+          "freshnessMs": 2000
+        }
+      ],
+      "steps": [
+        {
+          "id": "start_round",
+          "kind": "record",
+          "label": "start_round",
+          "event": "probe.started",
+          "fields": [
+            {
+              "name": "task",
+              "value": {
+                "kind": "ref",
+                "base": {
+                  "type": "state",
+                  "root": "task"
+                },
+                "steps": [
+                  {
+                    "type": "field",
+                    "name": "name"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "run",
+              "value": {
+                "kind": "ref",
+                "base": {
+                  "type": "state",
+                  "root": "task"
+                },
+                "steps": [
+                  {
+                    "type": "field",
+                    "name": "run_id"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "zone",
+              "value": {
+                "kind": "ref",
+                "base": {
+                  "type": "state",
+                  "root": "zone"
+                },
+                "steps": [
+                  {
+                    "type": "field",
+                    "name": "current_id"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "to_lane",
+          "kind": "move",
+          "label": "to_lane",
+          "route": {
+            "zone": "house-3-feed-lane"
+          },
+          "speed": {
+            "value": 0.35,
+            "unit": "m/s"
+          },
+          "within": {
+            "value": 120,
+            "unit": "s",
+            "ms": 120000
+          }
+        },
+        {
+          "id": "dispense",
+          "kind": "with_permit",
+          "label": "dispense",
+          "permit": "tool_energy",
+          "on": [
+            {
+              "class": "tool",
+              "instance": "dispenser"
+            }
+          ],
+          "lease": {
+            "value": 60,
+            "unit": "s",
+            "ms": 60000
+          },
+          "body": [
+            {
+              "id": "pour",
+              "kind": "actuate",
+              "label": "pour",
+              "capability": "dispense_mass.v1",
+              "args": [
+                {
+                  "name": "station",
+                  "value": {
+                    "kind": "string",
+                    "value": "probe-station"
+                  }
+                },
+                {
+                  "name": "mass",
+                  "value": {
+                    "kind": "quantity",
+                    "value": 2.5,
+                    "unit": "kg"
+                  }
+                },
+                {
+                  "name": "rate",
+                  "value": {
+                    "kind": "quantity",
+                    "value": 0.3,
+                    "unit": "kg/s"
+                  }
+                }
+              ],
+              "within": {
+                "value": 25,
+                "unit": "s",
+                "ms": 25000
+              },
+              "verify": [
+                {
+                  "condition": {
+                    "kind": "binary",
+                    "op": ">=",
+                    "left": {
+                      "kind": "ref",
+                      "base": {
+                        "type": "state",
+                        "root": "tool"
+                      },
+                      "steps": [
+                        {
+                          "type": "field",
+                          "name": "dispensed_mass"
+                        }
+                      ]
+                    },
+                    "right": {
+                      "kind": "quantity",
+                      "value": 2.4,
+                      "unit": "kg"
+                    }
+                  },
+                  "freshnessMs": 2000
+                },
+                {
+                  "condition": {
+                    "kind": "binary",
+                    "op": "<=",
+                    "left": {
+                      "kind": "ref",
+                      "base": {
+                        "type": "state",
+                        "root": "tool"
+                      },
+                      "steps": [
+                        {
+                          "type": "field",
+                          "name": "dispensed_mass"
+                        }
+                      ]
+                    },
+                    "right": {
+                      "kind": "quantity",
+                      "value": 2.6,
+                      "unit": "kg"
+                    }
+                  },
+                  "freshnessMs": 2000
+                }
+              ],
+              "idempotencyKey": {
+                "kind": "binary",
+                "op": "+",
+                "left": {
+                  "kind": "ref",
+                  "base": {
+                    "type": "state",
+                    "root": "task"
+                  },
+                  "steps": [
+                    {
+                      "type": "field",
+                      "name": "run_id"
+                    }
+                  ]
+                },
+                "right": {
+                  "kind": "string",
+                  "value": ":probe"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "done",
+          "kind": "finish",
+          "label": "done",
+          "status": "success",
+          "message": {
+            "kind": "string",
+            "value": "probe finished"
+          }
+        }
+      ],
+      "onFault": [
+        {
+          "id": "stop",
+          "kind": "safe_stop",
+          "label": "stop",
+          "reason": {
+            "kind": "string",
+            "value": "probe fault"
+          }
+        },
+        {
+          "id": "end",
+          "kind": "finish",
+          "label": "end",
+          "status": "failed",
+          "errorCode": "PROBE_FAULT",
+          "message": {
+            "kind": "string",
+            "value": "probe faulted"
+          }
+        }
+      ],
+      "evidence": {
+        "retain": [
+          "journal"
+        ],
+        "retentionDays": 30
+      },
+      "index": [
+        {
+          "id": "start_round",
+          "kind": "record",
+          "label": "start_round",
+          "parents": []
+        },
+        {
+          "id": "to_lane",
+          "kind": "move",
+          "label": "to_lane",
+          "parents": []
+        },
+        {
+          "id": "pour",
+          "kind": "actuate",
+          "label": "pour",
+          "capability": "dispense_mass.v1",
+          "parents": [
+            "dispense"
+          ]
+        },
+        {
+          "id": "dispense",
+          "kind": "with_permit",
+          "label": "dispense",
+          "permits": [
+            "tool_energy"
+          ],
+          "parents": []
+        },
+        {
+          "id": "done",
+          "kind": "finish",
+          "label": "done",
+          "parents": []
+        },
+        {
+          "id": "stop",
+          "kind": "safe_stop",
+          "label": "stop",
+          "parents": []
+        },
+        {
+          "id": "end",
+          "kind": "finish",
+          "label": "end",
+          "parents": []
+        }
+      ],
+      "statistics": {
+        "statementCount": 7,
+        "actuatingStatements": 2,
+        "capabilities": [
+          "dispense_mass.v1"
+        ],
+        "resourceClaims": [
+          "tool[dispenser]"
+        ],
+        "permitScopes": 1,
+        "guards": 0,
+        "parallelBranches": 0,
+        "maxParallelWidth": 0,
+        "maxLoopBound": 0,
+        "maxRetryAttempts": 0,
+        "taskDeadlineMs": 600000,
+        "subtaskCalls": 0
+      }
+    }
+  },
+  "journal": {
+    "eventCount": 31,
+    "journalHash": "7295129215cc8ce61d2a25a2065b6ffd56050d0d4adf7c71ffb910a3cb37bbb5",
+    "canonicalTrace": "[{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000001\",\"kind\":\"mission.started\",\"payload\":{\"carrier\":\"AR-01\",\"cassette\":\"FD-01\",\"irHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"scenario\":{\"name\":\"ScriptedWorld\"},\"sourceHash\":\"e7b26f98081b4c94e5b5fd9526a907d123aa278e11cbf9c540e4e1a42f89f66b\",\"task\":\"golden-probe@1.0.0\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":1,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000002\",\"kind\":\"preflight.checked\",\"payload\":{\"condition\":\"safety.mode == #AUTO_TASK\",\"freshnessMs\":500,\"holds\":true,\"stale\":false},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":2,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000003\",\"kind\":\"preflight.checked\",\"payload\":{\"condition\":\"cassette.latch == #LOCKED\",\"freshnessMs\":500,\"holds\":true,\"stale\":false},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":3,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000004\",\"kind\":\"preflight.checked\",\"payload\":{\"condition\":\"operator.present == true\",\"freshnessMs\":500,\"holds\":true,\"stale\":false},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":4,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000005\",\"kind\":\"preflight.checked\",\"payload\":{\"condition\":\"battery.charge >= 35 %\",\"freshnessMs\":2000,\"holds\":true,\"stale\":false},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":5,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000006\",\"kind\":\"statement.entered\",\"payload\":{\"id\":\"start_round\",\"kind\":\"record\",\"label\":\"start_round\",\"path\":\"start_round\",\"t\":0},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":6,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000007\",\"kind\":\"record.emitted\",\"payload\":{\"event\":\"probe.started\",\"fields\":{\"run\":\"golden-probe-run\",\"task\":\"golden-probe\",\"zone\":\"house-3-feed-lane\"},\"id\":\"start_round\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":7,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000008\",\"kind\":\"statement.completed\",\"payload\":{\"id\":\"start_round\",\"kind\":\"record\",\"t\":0},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":8,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000009\",\"kind\":\"twin.frame\",\"payload\":{\"arms\":[],\"carrier\":{\"armsDeployed\":false,\"battery\":92,\"heading\":0,\"parked\":true,\"speed\":0,\"tilt\":0,\"x\":0,\"y\":0},\"safety\":{\"state\":\"UNKNOWN\",\"tripped\":[]},\"statementId\":\"start_round\",\"t\":0,\"tally\":{\"abstained\":0,\"cracked\":0,\"offered\":0,\"picked\":0,\"placed\":0,\"rejected\":0}},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":9,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000010\",\"kind\":\"statement.entered\",\"payload\":{\"id\":\"to_lane\",\"kind\":\"move\",\"label\":\"to_lane\",\"path\":\"to_lane\",\"t\":0},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":10,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000011\",\"kind\":\"action.dispatched\",\"payload\":{\"deadlineMs\":120000,\"id\":\"to_lane\",\"kind\":\"move\",\"target\":\"house-3-feed-lane\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":11,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:00.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000012\",\"kind\":\"action.verified\",\"payload\":{\"durationMs\":1000,\"id\":\"to_lane\",\"notes\":[],\"target\":\"house-3-feed-lane\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":12,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000013\",\"kind\":\"statement.completed\",\"payload\":{\"id\":\"to_lane\",\"kind\":\"move\",\"t\":1000},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":13,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000014\",\"kind\":\"twin.frame\",\"payload\":{\"arms\":[],\"carrier\":{\"armsDeployed\":false,\"battery\":92,\"heading\":0,\"parked\":false,\"speed\":0,\"tilt\":0,\"x\":0,\"y\":0},\"safety\":{\"state\":\"AUTO_TASK\",\"tripped\":[]},\"statementId\":\"to_lane\",\"t\":1000,\"tally\":{\"abstained\":0,\"cracked\":0,\"offered\":0,\"picked\":0,\"placed\":0,\"rejected\":0}},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":14,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000015\",\"kind\":\"statement.entered\",\"payload\":{\"id\":\"dispense\",\"kind\":\"with_permit\",\"label\":\"dispense\",\"path\":\"dispense\",\"t\":1000},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":15,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000016\",\"kind\":\"permit.requested\",\"payload\":{\"holder\":\"mission\",\"kind\":\"tool_energy\",\"leaseMs\":60000,\"resources\":[\"tool.dispenser\"]},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":16,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000017\",\"kind\":\"resource.claimed\",\"payload\":{\"exclusive\":true,\"holder\":\"mission\",\"key\":\"tool.dispenser\",\"permitId\":\"permit-1\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":17,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000018\",\"kind\":\"permit.granted\",\"payload\":{\"expiresAtMs\":1791565261000,\"holder\":\"mission\",\"kind\":\"tool_energy\",\"permitId\":\"permit-1\",\"resources\":[\"tool.dispenser\"]},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":18,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000019\",\"kind\":\"statement.entered\",\"payload\":{\"id\":\"pour\",\"kind\":\"actuate\",\"label\":\"pour\",\"path\":\"dispense/pour\",\"t\":1000},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":19,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000020\",\"kind\":\"action.dispatched\",\"payload\":{\"args\":{\"mass\":{\"unit\":\"kg\",\"value\":2.5},\"rate\":{\"unit\":\"kg/s\",\"value\":0.3},\"station\":\"probe-station\"},\"attempt\":1,\"capability\":\"dispense_mass.v1\",\"deadlineMs\":25000,\"id\":\"pour\",\"idempotencyKey\":\"golden-probe-run:probe\",\"resources\":[\"tool.dispenser\"]},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":20,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.000Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000021\",\"kind\":\"action.verified\",\"payload\":{\"attempt\":1,\"capability\":\"dispense_mass.v1\",\"checks\":[{\"condition\":\"tool.dispensed_mass >= 2.4 kg\",\"passed\":true,\"stale\":false},{\"condition\":\"tool.dispensed_mass <= 2.6 kg\",\"passed\":true,\"stale\":false}],\"durationMs\":250,\"id\":\"pour\",\"notes\":[]},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":21,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000022\",\"kind\":\"statement.completed\",\"payload\":{\"id\":\"pour\",\"kind\":\"actuate\",\"t\":1250},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":22,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000023\",\"kind\":\"twin.frame\",\"payload\":{\"arms\":[],\"carrier\":{\"armsDeployed\":false,\"battery\":92,\"heading\":0,\"parked\":false,\"speed\":0,\"tilt\":0,\"x\":0,\"y\":0},\"safety\":{\"state\":\"AUTO_TASK\",\"tripped\":[]},\"statementId\":\"pour\",\"t\":1250,\"tally\":{\"abstained\":0,\"cracked\":0,\"offered\":0,\"picked\":0,\"placed\":0,\"rejected\":0}},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":23,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000024\",\"kind\":\"resource.released\",\"payload\":{\"holder\":\"mission\",\"key\":\"tool.dispenser\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":24,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000025\",\"kind\":\"permit.released\",\"payload\":{\"holder\":\"mission\",\"kind\":\"tool_energy\",\"permitId\":\"permit-1\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":25,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000026\",\"kind\":\"statement.completed\",\"payload\":{\"id\":\"dispense\",\"kind\":\"with_permit\",\"t\":1250},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":26,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000027\",\"kind\":\"twin.frame\",\"payload\":{\"arms\":[],\"carrier\":{\"armsDeployed\":false,\"battery\":92,\"heading\":0,\"parked\":false,\"speed\":0,\"tilt\":0,\"x\":0,\"y\":0},\"safety\":{\"state\":\"AUTO_TASK\",\"tripped\":[]},\"statementId\":\"dispense\",\"t\":1250,\"tally\":{\"abstained\":0,\"cracked\":0,\"offered\":0,\"picked\":0,\"placed\":0,\"rejected\":0}},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":27,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000028\",\"kind\":\"statement.entered\",\"payload\":{\"id\":\"done\",\"kind\":\"finish\",\"label\":\"done\",\"path\":\"done\",\"t\":1250},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":28,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000029\",\"kind\":\"statement.interrupted\",\"payload\":{\"id\":\"done\",\"kind\":\"finish\",\"t\":1250},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":29,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000030\",\"kind\":\"mission.completed\",\"payload\":{\"elapsedMs\":1250,\"message\":\"probe finished\",\"safety\":{\"state\":\"AUTO_TASK\",\"tripped\":[]},\"status\":\"completed\",\"tally\":{\"abstained\":0,\"cracked\":0,\"offered\":0,\"picked\":0,\"placed\":0,\"rejected\":0},\"visits\":5},\"quality\":\"GOOD\",\"safetyState\":\"AUTO_TASK\",\"sequence\":30,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"},{\"configuration\":{\"carrierId\":\"AR-01\",\"cassetteSerial\":\"FD-01\",\"recipeHash\":\"a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6\",\"calibrationBundleHash\":\"sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba\"},\"eventId\":\"golden-probe-run:000031\",\"kind\":\"checkpoint.saved\",\"payload\":{\"clockMs\":1250,\"cursor\":\"dispense\"},\"quality\":\"GOOD\",\"safetyState\":\"UNKNOWN\",\"sequence\":31,\"source\":\"simulator\",\"timestamp\":\"2026-10-09T17:00:01.250Z\"}]",
+    "events": [
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000001",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 1,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "mission.started",
+        "payload": {
+          "task": "golden-probe@1.0.0",
+          "irHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "sourceHash": "e7b26f98081b4c94e5b5fd9526a907d123aa278e11cbf9c540e4e1a42f89f66b",
+          "carrier": "AR-01",
+          "cassette": "FD-01",
+          "scenario": {
+            "name": "ScriptedWorld"
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000002",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 2,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "preflight.checked",
+        "payload": {
+          "condition": "safety.mode == #AUTO_TASK",
+          "holds": true,
+          "stale": false,
+          "freshnessMs": 500
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000003",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 3,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "preflight.checked",
+        "payload": {
+          "condition": "cassette.latch == #LOCKED",
+          "holds": true,
+          "stale": false,
+          "freshnessMs": 500
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000004",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 4,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "preflight.checked",
+        "payload": {
+          "condition": "operator.present == true",
+          "holds": true,
+          "stale": false,
+          "freshnessMs": 500
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000005",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 5,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "preflight.checked",
+        "payload": {
+          "condition": "battery.charge >= 35 %",
+          "holds": true,
+          "stale": false,
+          "freshnessMs": 2000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000006",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 6,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.entered",
+        "payload": {
+          "id": "start_round",
+          "kind": "record",
+          "label": "start_round",
+          "path": "start_round",
+          "t": 0
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000007",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 7,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "record.emitted",
+        "payload": {
+          "id": "start_round",
+          "event": "probe.started",
+          "fields": {
+            "task": "golden-probe",
+            "run": "golden-probe-run",
+            "zone": "house-3-feed-lane"
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000008",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 8,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.completed",
+        "payload": {
+          "id": "start_round",
+          "kind": "record",
+          "t": 0
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000009",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 9,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "twin.frame",
+        "payload": {
+          "statementId": "start_round",
+          "t": 0,
+          "carrier": {
+            "x": 0,
+            "y": 0,
+            "heading": 0,
+            "speed": 0,
+            "parked": true,
+            "tilt": 0,
+            "armsDeployed": false,
+            "battery": 92
+          },
+          "arms": [],
+          "tally": {
+            "offered": 0,
+            "picked": 0,
+            "placed": 0,
+            "cracked": 0,
+            "abstained": 0,
+            "rejected": 0
+          },
+          "safety": {
+            "state": "UNKNOWN",
+            "tripped": []
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000010",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 10,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.entered",
+        "payload": {
+          "id": "to_lane",
+          "kind": "move",
+          "label": "to_lane",
+          "path": "to_lane",
+          "t": 0
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000011",
+        "timestamp": "2026-10-09T17:00:00.000Z",
+        "monotonicNs": 1791565200000000000,
+        "source": "simulator",
+        "sequence": 11,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "action.dispatched",
+        "payload": {
+          "id": "to_lane",
+          "kind": "move",
+          "target": "house-3-feed-lane",
+          "deadlineMs": 120000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000012",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 12,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "action.verified",
+        "payload": {
+          "id": "to_lane",
+          "target": "house-3-feed-lane",
+          "durationMs": 1000,
+          "notes": []
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000013",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 13,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.completed",
+        "payload": {
+          "id": "to_lane",
+          "kind": "move",
+          "t": 1000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000014",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 14,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "twin.frame",
+        "payload": {
+          "statementId": "to_lane",
+          "t": 1000,
+          "carrier": {
+            "x": 0,
+            "y": 0,
+            "heading": 0,
+            "speed": 0,
+            "parked": false,
+            "tilt": 0,
+            "armsDeployed": false,
+            "battery": 92
+          },
+          "arms": [],
+          "tally": {
+            "offered": 0,
+            "picked": 0,
+            "placed": 0,
+            "cracked": 0,
+            "abstained": 0,
+            "rejected": 0
+          },
+          "safety": {
+            "state": "AUTO_TASK",
+            "tripped": []
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000015",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 15,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.entered",
+        "payload": {
+          "id": "dispense",
+          "kind": "with_permit",
+          "label": "dispense",
+          "path": "dispense",
+          "t": 1000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000016",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 16,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "permit.requested",
+        "payload": {
+          "holder": "mission",
+          "kind": "tool_energy",
+          "resources": [
+            "tool.dispenser"
+          ],
+          "leaseMs": 60000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000017",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 17,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "resource.claimed",
+        "payload": {
+          "key": "tool.dispenser",
+          "holder": "mission",
+          "exclusive": true,
+          "permitId": "permit-1"
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000018",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 18,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "permit.granted",
+        "payload": {
+          "holder": "mission",
+          "kind": "tool_energy",
+          "permitId": "permit-1",
+          "resources": [
+            "tool.dispenser"
+          ],
+          "expiresAtMs": 1791565261000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000019",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 19,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.entered",
+        "payload": {
+          "id": "pour",
+          "kind": "actuate",
+          "label": "pour",
+          "path": "dispense/pour",
+          "t": 1000
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000020",
+        "timestamp": "2026-10-09T17:00:01.000Z",
+        "monotonicNs": 1791565201000000000,
+        "source": "simulator",
+        "sequence": 20,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "action.dispatched",
+        "payload": {
+          "id": "pour",
+          "capability": "dispense_mass.v1",
+          "args": {
+            "station": "probe-station",
+            "mass": {
+              "value": 2.5,
+              "unit": "kg"
+            },
+            "rate": {
+              "value": 0.3,
+              "unit": "kg/s"
+            }
+          },
+          "resources": [
+            "tool.dispenser"
+          ],
+          "attempt": 1,
+          "deadlineMs": 25000,
+          "idempotencyKey": "golden-probe-run:probe"
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000021",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 21,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "action.verified",
+        "payload": {
+          "id": "pour",
+          "capability": "dispense_mass.v1",
+          "attempt": 1,
+          "durationMs": 250,
+          "checks": [
+            {
+              "condition": "tool.dispensed_mass >= 2.4 kg",
+              "passed": true,
+              "stale": false
+            },
+            {
+              "condition": "tool.dispensed_mass <= 2.6 kg",
+              "passed": true,
+              "stale": false
+            }
+          ],
+          "notes": []
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000022",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 22,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.completed",
+        "payload": {
+          "id": "pour",
+          "kind": "actuate",
+          "t": 1250
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000023",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 23,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "twin.frame",
+        "payload": {
+          "statementId": "pour",
+          "t": 1250,
+          "carrier": {
+            "x": 0,
+            "y": 0,
+            "heading": 0,
+            "speed": 0,
+            "parked": false,
+            "tilt": 0,
+            "armsDeployed": false,
+            "battery": 92
+          },
+          "arms": [],
+          "tally": {
+            "offered": 0,
+            "picked": 0,
+            "placed": 0,
+            "cracked": 0,
+            "abstained": 0,
+            "rejected": 0
+          },
+          "safety": {
+            "state": "AUTO_TASK",
+            "tripped": []
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000024",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 24,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "resource.released",
+        "payload": {
+          "key": "tool.dispenser",
+          "holder": "mission"
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000025",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 25,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "permit.released",
+        "payload": {
+          "permitId": "permit-1",
+          "kind": "tool_energy",
+          "holder": "mission"
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000026",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 26,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.completed",
+        "payload": {
+          "id": "dispense",
+          "kind": "with_permit",
+          "t": 1250
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000027",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 27,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "twin.frame",
+        "payload": {
+          "statementId": "dispense",
+          "t": 1250,
+          "carrier": {
+            "x": 0,
+            "y": 0,
+            "heading": 0,
+            "speed": 0,
+            "parked": false,
+            "tilt": 0,
+            "armsDeployed": false,
+            "battery": 92
+          },
+          "arms": [],
+          "tally": {
+            "offered": 0,
+            "picked": 0,
+            "placed": 0,
+            "cracked": 0,
+            "abstained": 0,
+            "rejected": 0
+          },
+          "safety": {
+            "state": "AUTO_TASK",
+            "tripped": []
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000028",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 28,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.entered",
+        "payload": {
+          "id": "done",
+          "kind": "finish",
+          "label": "done",
+          "path": "done",
+          "t": 1250
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000029",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 29,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "statement.interrupted",
+        "payload": {
+          "id": "done",
+          "kind": "finish",
+          "t": 1250
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000030",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 30,
+        "runId": "golden-probe-run",
+        "safetyState": "AUTO_TASK",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "mission.completed",
+        "payload": {
+          "status": "completed",
+          "message": "probe finished",
+          "elapsedMs": 1250,
+          "visits": 5,
+          "tally": {
+            "offered": 0,
+            "picked": 0,
+            "placed": 0,
+            "cracked": 0,
+            "abstained": 0,
+            "rejected": 0
+          },
+          "safety": {
+            "state": "AUTO_TASK",
+            "tripped": []
+          }
+        }
+      },
+      {
+        "schemaVersion": "agri.event/v1",
+        "eventId": "golden-probe-run:000031",
+        "timestamp": "2026-10-09T17:00:01.250Z",
+        "monotonicNs": 1791565201250000000,
+        "source": "simulator",
+        "sequence": 31,
+        "runId": "golden-probe-run",
+        "safetyState": "UNKNOWN",
+        "quality": "GOOD",
+        "configuration": {
+          "carrierId": "AR-01",
+          "cassetteSerial": "FD-01",
+          "recipeHash": "a4f0fa00c40458bdf454301a94495b2e2e20f8bbfd8510526c78be7923cf50a6",
+          "calibrationBundleHash": "sha256:9fa67484ddac3e44bb36a36514f645612de0458a29968f594e9f00e5e8fd75ba"
+        },
+        "kind": "checkpoint.saved",
+        "payload": {
+          "cursor": "dispense",
+          "clockMs": 1250
+        }
+      }
+    ]
+  }
+}

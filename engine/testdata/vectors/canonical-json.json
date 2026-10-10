@@ -1,0 +1,98 @@
+{
+  "fixtureVersion": 1,
+  "generator": "packages/engine/test/golden-traces.test.ts",
+  "note": "Two orders, because the engine uses both: the journal hash stringifies with configuration keys in run order and payload keys sorted, while the IR hash sorts everything.",
+  "cases": [
+    {
+      "index": 0,
+      "name": "empty object",
+      "inputText": "{}",
+      "stringify": "{}",
+      "canonical": "{}"
+    },
+    {
+      "index": 1,
+      "name": "empty array",
+      "inputText": "[]",
+      "stringify": "[]",
+      "canonical": "[]"
+    },
+    {
+      "index": 2,
+      "name": "unsorted keys",
+      "inputText": "{\"z\":1,\"a\":2,\"m\":3,\"B\":4,\"_x\":5,\"0z\":6}",
+      "stringify": "{\"z\":1,\"a\":2,\"m\":3,\"B\":4,\"_x\":5,\"0z\":6}",
+      "canonical": "{\"0z\":6,\"B\":4,\"_x\":5,\"a\":2,\"m\":3,\"z\":1}"
+    },
+    {
+      "index": 3,
+      "name": "integer-index keys hoist ahead of sorted string keys",
+      "inputText": "{\"b\":1,\"10\":2,\"2\":3,\"1\":4,\"0\":5,\"a\":6,\"-1\":7,\"1.0\":8,\"01\":9}",
+      "stringify": "{\"0\":5,\"1\":4,\"2\":3,\"10\":2,\"b\":1,\"a\":6,\"-1\":7,\"1.0\":8,\"01\":9}",
+      "canonical": "{\"0\":5,\"1\":4,\"2\":3,\"10\":2,\"-1\":7,\"01\":9,\"1.0\":8,\"a\":6,\"b\":1}"
+    },
+    {
+      "index": 4,
+      "name": "nested objects and arrays",
+      "inputText": "{\"outer\":{\"inner\":[1,{\"deep\":true},null,\"x\"]},\"list\":[[],[[]],{}]}",
+      "stringify": "{\"outer\":{\"inner\":[1,{\"deep\":true},null,\"x\"]},\"list\":[[],[[]],{}]}",
+      "canonical": "{\"list\":[[],[[]],{}],\"outer\":{\"inner\":[1,{\"deep\":true},null,\"x\"]}}"
+    },
+    {
+      "index": 5,
+      "name": "booleans and null",
+      "inputText": "{\"t\":true,\"f\":false,\"n\":null}",
+      "stringify": "{\"t\":true,\"f\":false,\"n\":null}",
+      "canonical": "{\"f\":false,\"n\":null,\"t\":true}"
+    },
+    {
+      "index": 6,
+      "name": "numbers in every format",
+      "inputText": "{\"i\":42,\"neg\":-7,\"d\":0.5,\"e\":1e21,\"tiny\":5e-324,\"zero\":0,\"negzero\":-0}",
+      "stringify": "{\"i\":42,\"neg\":-7,\"d\":0.5,\"e\":1e+21,\"tiny\":5e-324,\"zero\":0,\"negzero\":0}",
+      "canonical": "{\"d\":0.5,\"e\":1e+21,\"i\":42,\"neg\":-7,\"negzero\":0,\"tiny\":5e-324,\"zero\":0}"
+    },
+    {
+      "index": 7,
+      "name": "escapes",
+      "inputText": "{\"quote\":\"a\\\"b\",\"back\":\"a\\\\b\",\"nl\":\"a\\nb\",\"tab\":\"a\\tb\",\"cr\":\"a\\rb\",\"bs\":\"a\\bb\",\"ff\":\"a\\fb\"}",
+      "stringify": "{\"quote\":\"a\\\"b\",\"back\":\"a\\\\b\",\"nl\":\"a\\nb\",\"tab\":\"a\\tb\",\"cr\":\"a\\rb\",\"bs\":\"a\\bb\",\"ff\":\"a\\fb\"}",
+      "canonical": "{\"back\":\"a\\\\b\",\"bs\":\"a\\bb\",\"cr\":\"a\\rb\",\"ff\":\"a\\fb\",\"nl\":\"a\\nb\",\"quote\":\"a\\\"b\",\"tab\":\"a\\tb\"}"
+    },
+    {
+      "index": 8,
+      "name": "control characters",
+      "inputText": "{\"nul\":\"a\\u0000b\",\"unit\":\"a\\u001fb\",\"del\":\"a\\u007fb\",\"esc\":\"a\\u001bb\"}",
+      "stringify": "{\"nul\":\"a\\u0000b\",\"unit\":\"a\\u001fb\",\"del\":\"ab\",\"esc\":\"a\\u001bb\"}",
+      "canonical": "{\"del\":\"ab\",\"esc\":\"a\\u001bb\",\"nul\":\"a\\u0000b\",\"unit\":\"a\\u001fb\"}"
+    },
+    {
+      "index": 9,
+      "name": "line separators stay raw",
+      "inputText": "{\"ls\":\"a\\u2028b\",\"ps\":\"a\\u2029b\",\"nbsp\":\"a\\u00a0b\"}",
+      "stringify": "{\"ls\":\"a b\",\"ps\":\"a b\",\"nbsp\":\"a b\"}",
+      "canonical": "{\"ls\":\"a b\",\"nbsp\":\"a b\",\"ps\":\"a b\"}"
+    },
+    {
+      "index": 10,
+      "name": "non-ASCII stays UTF-8",
+      "inputText": "{\"accent\":\"café\",\"egg\":\"🥚\",\"cjk\":\"鶏卵\",\"mixed\":\"é🙂z\"}",
+      "stringify": "{\"accent\":\"café\",\"egg\":\"🥚\",\"cjk\":\"鶏卵\",\"mixed\":\"é🙂z\"}",
+      "canonical": "{\"accent\":\"café\",\"cjk\":\"鶏卵\",\"egg\":\"🥚\",\"mixed\":\"é🙂z\"}"
+    },
+    {
+      "index": 11,
+      "name": "UTF-16 key order differs from code-point order",
+      "inputText": "{\"￿\":1,\"😀\":2,\"z\":3,\"a\":4}",
+      "stringify": "{\"￿\":1,\"😀\":2,\"z\":3,\"a\":4}",
+      "canonical": "{\"a\":4,\"z\":3,\"😀\":2,\"￿\":1}"
+    },
+    {
+      "index": 12,
+      "name": "deep nesting with mixed key orders",
+      "inputText": "{\"b\":{\"z\":[1,{\"q\":1,\"p\":2}],\"a\":2},\"a\":[true,false,null]}",
+      "stringify": "{\"b\":{\"z\":[1,{\"q\":1,\"p\":2}],\"a\":2},\"a\":[true,false,null]}",
+      "canonical": "{\"a\":[true,false,null],\"b\":{\"a\":2,\"z\":[1,{\"p\":2,\"q\":1}]}}"
+    }
+  ]
+}

@@ -81,3 +81,28 @@ jobs:
 
       - name: Build the app
         run: npm run build --workspace apps/virtual-lab
+
+  engine-cpp:
+    # `npm run verify` cannot compile C++. This job is the gate that proves the
+    # engine a robot runs and the engine the Virtual Lab runs produce the same
+    # bytes: it rebuilds engine/ from vendored dependencies and re-derives every
+    # golden trace hash in engine/testdata/.
+    name: C++ engine build and equivalence tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          cmake --version | head -1
+          c++ --version | head -1
+
+      - name: Configure
+        run: cmake -S engine -B engine/build -DCMAKE_BUILD_TYPE=Release -DAGRI_ENGINE_WERROR=ON
+
+      - name: Build
+        run: cmake --build engine/build -j"$(nproc)"
+
+      - name: Test
+        run: ctest --test-dir engine/build --output-on-failure

@@ -120,26 +120,38 @@ export class Journal {
 
   /** sha256 over the canonical event stream: the trace identity. */
   hash(): string {
-    const canonical = JSON.stringify(
-      this.events.map((event) => ({
-        configuration: event.configuration,
-        eventId: event.eventId,
-        kind: event.kind,
-        payload: sortDeep(event.payload),
-        quality: event.quality,
-        safetyState: event.safetyState,
-        sequence: event.sequence,
-        source: event.source,
-        timestamp: event.timestamp,
-      })),
-    );
-    return createHash('sha256').update(canonical, 'utf8').digest('hex');
+    return createHash('sha256').update(canonicalTraceOf(this.events), 'utf8').digest('hex');
   }
 
   /** Events of one kind, in order. */
   of(kind: string): JournalEvent[] {
     return this.events.filter((event) => event.kind === kind);
   }
+}
+
+/**
+ * The exact bytes a journal hash covers.
+ *
+ * This is the equivalence contract with the C++ engine in `engine/`: nine fields
+ * in this order, `payload` deep-sorted by key, `configuration` left in the order
+ * the run built it, and ECMAScript's own number and string formatting. Anything
+ * that changes these bytes changes every trace hash in the repository, so the
+ * golden fixtures under `engine/testdata/` are regenerated, never hand-edited.
+ */
+export function canonicalTraceOf(events: readonly JournalEvent[]): string {
+  return JSON.stringify(
+    events.map((event) => ({
+      configuration: event.configuration,
+      eventId: event.eventId,
+      kind: event.kind,
+      payload: sortDeep(event.payload),
+      quality: event.quality,
+      safetyState: event.safetyState,
+      sequence: event.sequence,
+      source: event.source,
+      timestamp: event.timestamp,
+    })),
+  );
 }
 
 function sortDeep(value: unknown): unknown {

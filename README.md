@@ -55,6 +55,7 @@ all of them.
 | [`packages/compiler-core`](packages/compiler-core/README.md) | implemented | Strict YAML loading, `agri.script/v1` schema validation, and the `agri.task/v1` lexer, parser, semantic checks (S1–S11) and canonical IR |
 | [`packages/policy`](packages/policy/README.md) | implemented | Capability allow-list 0.2.0 with hazard class, gate and approval checks, and `compileAgriTaskSource()` |
 | [`packages/engine`](packages/engine/README.md) | implemented | The `agri.task/v1` execution engine: interpreter, independent safety model, permits and resources, journal, checkpoints and the ARACNID kinematic world |
+| [`engine`](engine/README.md) | implemented, first increment | The C++23 engine the robots run: ROS-free, dependencies vendored, and held byte-identical to the TypeScript engine by golden traces. Canonical bytes, SHA-256 and the trace and IR hashes so far |
 | [`apps/virtual-lab`](apps/virtual-lab/README.md) | implemented, first cut | Nuxt 4 lab: compile a task, run it against the ARACNID twin in Node, replay the journal, safety functions and twin frames |
 | [`packages/asset-import`](packages/asset-import/README.md) | placeholder | GLTF/URDF ingestion and asset validation |
 | [`ros_ws`](ros_ws/README.md) | placeholder | ROS 2 Jazzy edge packages, with the planned decomposition recorded |
@@ -84,6 +85,15 @@ presence, tilt breach, full magazine, too few eggs) with six injectable fault
 kinds on top, and the lab replays the result. Everything physical is still a placeholder — the numbers
 behind the twin are listed against the measurements that close them in
 [docs/10 §9.1](docs/10_ARACNID_AR01_DESIGN_BASIS.md).
+
+Two engines, one set of bytes. [`packages/engine`](packages/engine/README.md) is
+the TypeScript reference; [`engine/`](engine/README.md) is the C++23 core a robot
+will run. They are held equivalent by golden fixtures generated from the reference
+and committed in [`engine/testdata/`](engine/testdata/README.md), which the C++
+suite re-hashes: the nominal ARACNID round above is
+`ca0008e7fbb31f68a1a6df16e1fc4e1630679e418f22e27419bec1dfbfbab90e` in both. That
+is the contract [`docs/09` §7](docs/09_DSL_AND_EXECUTION_ENGINE.md) asks for, and
+it runs in CI on every push.
 
 Rules for changing any of it — boundaries, fail-closed validation, versioned
 contracts, evidence and commit conventions — are in

@@ -110,7 +110,8 @@ packages/
   compiler-core/               # AgriScript AST, semantic checks, deterministic IR
   contracts/                   # versioned JSON/Protobuf action/state/event contracts
   policy/                      # capability, ODD, operator and chemical/food rules
-  engine/                      # agri.task/v1 interpreter, safety gate, world models
+  engine/                      # TypeScript reference engine: interpreter, safety gate, world models
+engine/                        # C++23 engine core the robots run (ROS-free, vendored deps)
 ros_ws/
   src/agri_bringup/
   src/agri_safety_bridge/
@@ -152,6 +153,7 @@ vertical slice (see `docs/09` for the toolchain and `docs/10` for the machine):
 | `packages/compiler-core` | implemented | Strict YAML load (duplicate and merge keys rejected), `agri.script/v1` validation, and the `agri.task/v1` lexer, parser and deterministic canonical IR |
 | `packages/policy` | implemented | Capability allow-list 0.2.0 with hazard class, minimum gate and approval checks, plus `compileAgriTaskSource()` as the single compile entry point |
 | `packages/engine` | implemented | Interpreter over the canonical IR, independent safety model, permit and resource ledgers, journal with a trace hash, checkpoints and resume, and the ARACNID kinematic world |
+| `engine` | implemented, first increment | The C++23 engine the robots run: self-contained SHA-256, the canonical JSON writer with both key orders, and trace and IR hashing, proven byte-identical to `packages/engine` by the golden fixtures in `engine/testdata`. No interpreter, no ROS dependency, no signing yet |
 | `dsl/grammar` | implemented | `agri.task/v1` BNF, conformance examples and `npm run check:grammar` |
 | `apps/virtual-lab` | implemented, first cut | Nuxt 4 lab: compiles a task from the closed shelf, executes it against the ARACNID twin in Node and replays the journal, the safety functions and the twin frames. No ROS, no hardware, no signing |
 | `packages/asset-import`, `ros_ws`, `simulation`, `ai`, `fleet`, `recipes`, `test_evidence` | placeholder | README records scope, entry criteria and boundaries; no implementation yet |

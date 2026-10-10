@@ -1,0 +1,357 @@
+{
+  "fixtureVersion": 1,
+  "generator": "packages/engine/test/golden-traces.test.ts",
+  "note": "ECMAScript Number::toString exactly as JSON.stringify writes it. `bits` is the IEEE-754 double, so a parser difference cannot hide behind a decimal string.",
+  "cases": [
+    {
+      "index": 0,
+      "bits": "0x0000000000000000",
+      "json": "0",
+      "document": "{\"value\":0}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 1,
+      "bits": "0x8000000000000000",
+      "json": "0",
+      "document": "{\"value\":0}",
+      "roundTripsBits": false
+    },
+    {
+      "index": 2,
+      "bits": "0x3ff0000000000000",
+      "json": "1",
+      "document": "{\"value\":1}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 3,
+      "bits": "0xbff0000000000000",
+      "json": "-1",
+      "document": "{\"value\":-1}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 4,
+      "bits": "0x4000000000000000",
+      "json": "2",
+      "document": "{\"value\":2}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 5,
+      "bits": "0x4024000000000000",
+      "json": "10",
+      "document": "{\"value\":10}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 6,
+      "bits": "0x4045000000000000",
+      "json": "42",
+      "document": "{\"value\":42}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 7,
+      "bits": "0xc045000000000000",
+      "json": "-42",
+      "document": "{\"value\":-42}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 8,
+      "bits": "0x4059000000000000",
+      "json": "100",
+      "document": "{\"value\":100}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 9,
+      "bits": "0x3fb999999999999a",
+      "json": "0.1",
+      "document": "{\"value\":0.1}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 10,
+      "bits": "0x3fe0000000000000",
+      "json": "0.5",
+      "document": "{\"value\":0.5}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 11,
+      "bits": "0x3ff8000000000000",
+      "json": "1.5",
+      "document": "{\"value\":1.5}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 12,
+      "bits": "0x4004000000000000",
+      "json": "2.5",
+      "document": "{\"value\":2.5}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 13,
+      "bits": "0x3fd999999999999a",
+      "json": "0.4",
+      "document": "{\"value\":0.4}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 14,
+      "bits": "0x3fd6666666666666",
+      "json": "0.35",
+      "document": "{\"value\":0.35}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 15,
+      "bits": "0x4003333333333333",
+      "json": "2.4",
+      "document": "{\"value\":2.4}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 16,
+      "bits": "0x4004cccccccccccd",
+      "json": "2.6",
+      "document": "{\"value\":2.6}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 17,
+      "bits": "0x4012666666666666",
+      "json": "4.6",
+      "document": "{\"value\":4.6}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 18,
+      "bits": "0x3feac083126e978d",
+      "json": "0.836",
+      "document": "{\"value\":0.836}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 19,
+      "bits": "0x404f400000000000",
+      "json": "62.5",
+      "document": "{\"value\":62.5}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 20,
+      "bits": "0x4032000000000000",
+      "json": "18",
+      "document": "{\"value\":18}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 21,
+      "bits": "0x400921fb54442d18",
+      "json": "3.141592653589793",
+      "document": "{\"value\":3.141592653589793}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 22,
+      "bits": "0x3fd5555555555555",
+      "json": "0.3333333333333333",
+      "document": "{\"value\":0.3333333333333333}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 23,
+      "bits": "0x3fe5555555555555",
+      "json": "0.6666666666666666",
+      "document": "{\"value\":0.6666666666666666}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 24,
+      "bits": "0x3fd3333333333334",
+      "json": "0.30000000000000004",
+      "document": "{\"value\":0.30000000000000004}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 25,
+      "bits": "0x3eb0c6f7a0b5ed8d",
+      "json": "0.000001",
+      "document": "{\"value\":0.000001}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 26,
+      "bits": "0x3e7ad7f29abcaf48",
+      "json": "1e-7",
+      "document": "{\"value\":1e-7}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 27,
+      "bits": "0x3e7ad7f29abcaf48",
+      "json": "1e-7",
+      "document": "{\"value\":1e-7}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 28,
+      "bits": "0x3ea0c6f7a0b5ed8d",
+      "json": "5e-7",
+      "document": "{\"value\":5e-7}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 29,
+      "bits": "0x3eb0c6f7a0b5ed8d",
+      "json": "0.000001",
+      "document": "{\"value\":0.000001}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 30,
+      "bits": "0x3ee4f8b588e368f1",
+      "json": "0.00001",
+      "document": "{\"value\":0.00001}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 31,
+      "bits": "0x3b92e3b40a0e9b4f",
+      "json": "1e-21",
+      "document": "{\"value\":1e-21}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 32,
+      "bits": "0x3b5e392010175ee6",
+      "json": "1e-22",
+      "document": "{\"value\":1e-22}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 33,
+      "bits": "0x4415af1d78b58c40",
+      "json": "100000000000000000000",
+      "document": "{\"value\":100000000000000000000}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 34,
+      "bits": "0x444b1ae4d6e2ef50",
+      "json": "1e+21",
+      "document": "{\"value\":1e+21}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 35,
+      "bits": "0x4480f0cf064dd592",
+      "json": "1e+22",
+      "document": "{\"value\":1e+22}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 36,
+      "bits": "0xc44b1ae4d6e2ef50",
+      "json": "-1e+21",
+      "document": "{\"value\":-1e+21}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 37,
+      "bits": "0x54b249ad2594c37d",
+      "json": "1e+100",
+      "document": "{\"value\":1e+100}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 38,
+      "bits": "0x44dfde9f10a8d361",
+      "json": "6.02e+23",
+      "document": "{\"value\":6.02e+23}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 39,
+      "bits": "0x3c079ca10c924223",
+      "json": "1.6e-19",
+      "document": "{\"value\":1.6e-19}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 40,
+      "bits": "0x40d53e0000000000",
+      "json": "21752",
+      "document": "{\"value\":21752}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 41,
+      "bits": "0x41424f8000000000",
+      "json": "2400000",
+      "document": "{\"value\":2400000}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 42,
+      "bits": "0x433fffffffffffff",
+      "json": "9007199254740991",
+      "document": "{\"value\":9007199254740991}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 43,
+      "bits": "0x4340000000000000",
+      "json": "9007199254740992",
+      "document": "{\"value\":9007199254740992}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 44,
+      "bits": "0x4340000000000001",
+      "json": "9007199254740994",
+      "document": "{\"value\":9007199254740994}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 45,
+      "bits": "0x441ac53a7e04bcda",
+      "json": "123456789012345680000",
+      "document": "{\"value\":123456789012345680000}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 46,
+      "bits": "0x45f8ee90ff6c373e",
+      "json": "1.2345678901234568e+29",
+      "document": "{\"value\":1.2345678901234568e+29}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 47,
+      "bits": "0x7fefffffffffffff",
+      "json": "1.7976931348623157e+308",
+      "document": "{\"value\":1.7976931348623157e+308}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 48,
+      "bits": "0x0010000000000000",
+      "json": "2.2250738585072014e-308",
+      "document": "{\"value\":2.2250738585072014e-308}",
+      "roundTripsBits": true
+    },
+    {
+      "index": 49,
+      "bits": "0x0000000000000001",
+      "json": "5e-324",
+      "document": "{\"value\":5e-324}",
+      "roundTripsBits": true
+    }
+  ]
+}
