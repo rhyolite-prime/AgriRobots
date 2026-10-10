@@ -1,5 +1,9 @@
 # Dependencies and build output
 node_modules/
+# npm's package-lock.json is authoritative (CI runs `npm ci`). pnpm is supported
+# for local development via pnpm-workspace.yaml, but its lockfile is not
+# committed, so the two cannot drift apart inside the repository.
+pnpm-lock.yaml
 dist/
 build/
 out/

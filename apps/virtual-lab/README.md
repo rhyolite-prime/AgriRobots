@@ -127,12 +127,18 @@ of the lab:
 
 ```bash
 npm install                                    # from the repository root
-npm run dev --workspace apps/virtual-lab       # http://localhost:3000
-npm run build --workspace apps/virtual-lab     # production bundle in .output/
+npm run dev                                    # http://localhost:3000
+npm run build                                  # production bundle in .output/
 npm run preview --workspace apps/virtual-lab   # serve that bundle
 npm run typecheck --workspace apps/virtual-lab # vue-tsc over app, server and shared
 npm run verify                                 # from the root: includes the lab's tests
 ```
+
+With pnpm — `pnpm install` then `pnpm run dev` from the root, or
+`pnpm --filter @agrirobots/virtual-lab dev`. Both trees execute the same engine
+code and produce the same journal hash for the same inputs; the difference is
+only how dependencies are laid out. `pnpm-workspace.yaml` is what makes the
+private `@agrirobots/*` ranges resolve locally instead of against the registry.
 
 The dev server binds `0.0.0.0:3000` and accepts any host header, so it works
 behind a proxied preview; if port 3000 is taken Nuxt picks the next one and

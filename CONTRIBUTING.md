@@ -20,7 +20,17 @@ Requires Node.js 20.11 or newer (see [`.nvmrc`](.nvmrc)).
 ```bash
 npm ci            # install workspace dependencies
 npm run verify    # structure, links, types, lint, format, tests
+npm run dev       # the Virtual Lab on http://localhost:3000
 ```
+
+**Package manager.** npm is authoritative: CI runs `npm ci` against
+`package-lock.json`, and a change that adds a workspace or a dependency must
+regenerate that lockfile in the same commit. pnpm is supported for local
+development — [`pnpm-workspace.yaml`](pnpm-workspace.yaml) names the workspace
+packages (pnpm does not read the `workspaces` field in `package.json`), turns on
+`linkWorkspacePackages` so the `"*"` ranges resolve locally instead of against
+the registry, and allows the `esbuild` build script that Vite needs. Its
+lockfile is git-ignored, so there is one lockfile to review and no drift.
 
 Individual steps:
 

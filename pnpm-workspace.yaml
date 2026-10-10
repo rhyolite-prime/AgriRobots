@@ -1,0 +1,34 @@
+# pnpm does not read the `workspaces` field in package.json. Without this file it
+# resolves `@agrirobots/*` against the npm registry, where they do not exist
+# because they are private workspace packages - which surfaces as
+# "@agrirobots/compiler-core is not in the npm registry, or you have no
+# permission to fetch it".
+#
+# npm stays the authoritative package manager: CI runs `npm ci` against
+# `package-lock.json`. pnpm is supported for local development, and its lockfile
+# is git-ignored so the two cannot drift apart inside the repository.
+
+# A `*` dependency range only links to a workspace package when this is on;
+# without it pnpm treats `*` as a registry range.
+linkWorkspacePackages: true
+
+# pnpm 10 and later block dependency build scripts unless the package is named
+# here. esbuild needs its postinstall to place its binary, and Vite/Nuxt cannot
+# start without it. `allowBuilds` is the pnpm 12 shape (a mapping);
+# `onlyBuiltDependencies` is the pnpm 10-11 shape (a list). Both are declared so
+# either generation of pnpm installs a working tree, and pnpm 12 accepts the pair
+# without complaint.
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+
+# The same explicit list as the root `package.json` `workspaces`, not a glob: a
+# new package joins the build by being named, so it cannot arrive unreviewed.
+packages:
+  - "packages/contracts"
+  - "packages/domain-model"
+  - "packages/compiler-core"
+  - "packages/policy"
+  - "packages/engine"
+  - "apps/virtual-lab"

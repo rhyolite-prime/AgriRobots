@@ -67,8 +67,14 @@ all of them.
 ```bash
 npm ci            # install workspace dependencies
 npm run verify    # structure, links, types, lint, format, tests
-npm run dev --workspace apps/virtual-lab   # the Virtual Lab on http://localhost:3000
+npm run dev       # the Virtual Lab on http://localhost:3000
 ```
+
+`pnpm install && pnpm run dev` works too — [`pnpm-workspace.yaml`](pnpm-workspace.yaml)
+names the workspace packages, because pnpm does not read the `workspaces` field
+in `package.json` and would otherwise try to fetch the private `@agrirobots/*`
+packages from the registry. npm remains authoritative: CI runs `npm ci` against
+`package-lock.json`, and `pnpm-lock.yaml` is not committed.
 
 The ARACNID round is executable today, end to end and without hardware:
 `dsl/examples/aracnid-egg-collection.agri` compiles to a canonical IR with a
